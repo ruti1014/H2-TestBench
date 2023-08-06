@@ -1,3 +1,17 @@
+
+/*-------------------------- H2-Testbench HKA --------------------------
+Description:      This File contains the main logic for controlling the testbench, the H2-Cell and the Sensors.
+                  Also the communication via usb and the storage of the recorded sensor values.
+Authors:          Jonas Geckle, Tim Ruf
+Last edited:      06.08.2023
+Planned features: - sensor class containing all sensors -> easy use, modular
+                  - sensor data capture using the sensor class
+                  - data Storage on SD-Card
+                  - data transfer via USB emulating a mass storage device
+                  - small display for easy test bench usage
+*/
+
+
 #include <Arduino.h>
 
 #define PIN_startHcell 4      // Gate 1 MOSFET to start-pin H-Cell (12 V)
@@ -8,14 +22,15 @@
 #define PIN_emergencystop 17  // emergency-stop
 #define PIN_start 18          // start-stop-switch
 
-int upper_leaklimit = 25;       // todo: correct values
-int lower_leaklimit = 15;  
+int upper_leaklimit = 25;  // todo: correct values
+int lower_leaklimit = 15;
 
-struct switches{
-  bool Hcell;             // 0: off   	    | 1: on
-  bool start;             // 0: not pressed | 1: pressed
-  bool recording;         // 0: not pressed | 1: pressed
-  bool emergencystop;     // 0: not pressed | 1: pressed
+
+struct switches {
+  bool Hcell;          // 0: off   	     | 1: on
+  bool start;          // 0: not pressed | 1: pressed
+  bool recording;      // 0: not pressed | 1: pressed
+  bool emergencystop;  // 0: not pressed | 1: pressed
   int leakvalue;
   int flowvalue;
 };
@@ -29,32 +44,31 @@ void stop_Hcell();
 void update_state();
 
 void setup() {
-
+  Serial.begin(9600);
+  Serial.println("Booting H2-Testbench");
   setup_pins();
   setup_state();
-  attachInterrupt(PIN_emergencystop, emergencystopISR, RISING);      // Triggers the interrupt when the pin goes from LOW to HIGH  
 }
 
 void loop() {
 
   update_state();
 
-  if(state.leakvalue >= upper_leaklimit)       // leak-value exceeds limit
+
+  //H-Cell control logic
+  if (state.leakvalue >= upper_leaklimit)  // leak-value exceeds limit -> danger of explosion
   {
     stop_Hcell();
-  }
-  else      // leak-value below limit
+  } else  // leak-value below limit
   {
-    if(state.start)       // start switch is pressed
+    if (state.start)  // start switch is pressed
     {
       start_Hcell();
-    }
-    else            // start switch off
+    } else  // start switch off
     {
       stop_Hcell();
     }
   }
-
 }
 
 void setup_pins() {
@@ -68,25 +82,27 @@ void setup_pins() {
 }
 
 void start_Hcell() {
-  if(state.Hcell == 0 && state.leakvalue < lower_leaklimit)
-  {
-    digitalWrite(PIN_cutoff, HIGH);         // open cut-off
-    digitalWrite(PIN_startHcell, HIGH);     // start H-Cell
+  Serial.print("Starting Hcell! ");
+  if (state.Hcell == 0 && state.leakvalue < lower_leaklimit) {
+    digitalWrite(PIN_cutoff, HIGH);      // open cut-off
+    digitalWrite(PIN_startHcell, HIGH);  // start H-Cell
     state.Hcell = 1;
+    Serial.println("Succesful!");
   }
 }
 
 void stop_Hcell() {
-  if(state.Hcell == 1)
-  {
-    digitalWrite(PIN_cutoff, LOW);        // close cut-off
-    digitalWrite(PIN_startHcell, LOW);    // turn off H-Cell
+   Serial.print("stopping Hcell! ");
+  if (state.Hcell == 1) {
+    digitalWrite(PIN_cutoff, LOW);      // close cut-off
+    digitalWrite(PIN_startHcell, LOW);  // turn off H-Cell
     state.Hcell = 0;
+    Serial.println("Succesful!");
   }
 }
 
-void setup_state()
-{
+void setup_state() {
+  //initial state values
   state.Hcell = 0;
   state.start = 0;
   state.recording = 0;
@@ -96,36 +112,14 @@ void setup_state()
 }
 
 void update_state() {
-  switch(PIN_start)
-  {
-    case HIGH:
-      state.start = 1;
-      break;
-    case LOW:
-      state.start = 0;
-      break;
-  }
+  //Update button positions
+  state.start = digitalRead(PIN_start);
+  state.recording = digitalRead(PIN_recording);
+  state.emergencystop = digitalRead(PIN_emergencystop);
 
-  switch(PIN_recording)
-  {
-    case HIGH:
-      state.recording = 1;
-      break;
-    case LOW:
-      state.recording = 0;
-      break;
-  }
+  //Todo: check if debounce is necessary, if so: software or hardware?
 
-  switch(PIN_emergencystop)
-  {
-    case HIGH:
-      state.emergencystop = 1;
-      break;
-    case LOW:
-      state.emergencystop = 0;
-      break;
-  }
-
+  //Update sensor values will be moved to own function!
   state.leakvalue = analogRead(PIN_leaksensor);
   state.flowvalue = analogRead(PIN_flowsensor);
 }
