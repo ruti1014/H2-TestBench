@@ -16,7 +16,7 @@ Planned features: - sensor class containing all sensors -> easy use, modular
 
 #define PIN_startHcell 4      // Gate 1 MOSFET to start-pin H-Cell (12 V)
 #define PIN_cutoff 5          // Gate 2 MOSFET to cut-off and flowsensor (24 V)
-#define PIN_recording 8       // recording-switch
+#define PIN_recording 18      // recording-switch
 #define PIN_leaksensor 15     // leaksensor analog in
 #define PIN_flowsensor 16     // flowsensor analog in
 #define PIN_emergencystop 17  // emergency-stop
@@ -51,7 +51,6 @@ void setup() {
 }
 
 void loop() {
-
   update_state();
 
 
@@ -74,30 +73,32 @@ void loop() {
 void setup_pins() {
   pinMode(PIN_startHcell, OUTPUT);
   pinMode(PIN_cutoff, OUTPUT);
-  pinMode(PIN_recording, INPUT);
+  pinMode(PIN_recording, INPUT_PULLDOWN);
   pinMode(PIN_leaksensor, INPUT);
   pinMode(PIN_flowsensor, INPUT);
-  pinMode(PIN_emergencystop, INPUT);
-  pinMode(PIN_start, INPUT);
+  pinMode(PIN_emergencystop, INPUT_PULLDOWN);
+  pinMode(PIN_start, INPUT_PULLDOWN);  // pull-down --> unpressed == low
 }
 
 void start_Hcell() {
-  Serial.print("Starting Hcell! ");
   if (state.Hcell == 0 && state.leakvalue < lower_leaklimit) {
+    Serial.print("TimeStamp: ");
+    Serial.print(micros());
+    Serial.println(": Starting Hcell! ");
     digitalWrite(PIN_cutoff, HIGH);      // open cut-off
     digitalWrite(PIN_startHcell, HIGH);  // start H-Cell
     state.Hcell = 1;
-    Serial.println("Succesful!");
   }
 }
 
 void stop_Hcell() {
-   Serial.print("stopping Hcell! ");
   if (state.Hcell == 1) {
+    Serial.print("TimeStamp: ");
+    Serial.print(micros());
+    Serial.println(" stopping Hcell! ");
     digitalWrite(PIN_cutoff, LOW);      // close cut-off
     digitalWrite(PIN_startHcell, LOW);  // turn off H-Cell
     state.Hcell = 0;
-    Serial.println("Succesful!");
   }
 }
 
@@ -113,13 +114,16 @@ void setup_state() {
 
 void update_state() {
   //Update button positions
-  state.start = digitalRead(PIN_start);
-  state.recording = digitalRead(PIN_recording);
-  state.emergencystop = digitalRead(PIN_emergencystop);
+  int buttonDebounceDelay = 50;  //debounce delay in ms
 
-  //Todo: check if debounce is necessary, if so: software or hardware?
+  if (millis() % buttonDebounceDelay == 0) {
+    state.start = digitalRead(PIN_start);
+    state.recording = digitalRead(PIN_recording);
+    state.emergencystop = digitalRead(PIN_emergencystop);
+  }
 
   //Update sensor values will be moved to own function!
-  state.leakvalue = analogRead(PIN_leaksensor);
+  // state.leakvalue = analogRead(PIN_leaksensor);
+  state.leakvalue = 5;  // temp. placeholder
   state.flowvalue = analogRead(PIN_flowsensor);
 }
