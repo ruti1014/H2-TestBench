@@ -78,6 +78,9 @@ void setup_pins() {
   pinMode(PIN_flowsensor, INPUT);
   pinMode(PIN_emergencystop, INPUT_PULLDOWN);
   pinMode(PIN_start, INPUT_PULLDOWN);  // pull-down --> unpressed == low
+
+  digitalWrite(PIN_startHcell, HIGH);     // to 12 V switch 
+  digitalWrite(PIN_cutoff, LOW);          // to 24 V switch
 }
 
 void start_Hcell() {
@@ -85,8 +88,8 @@ void start_Hcell() {
     Serial.print("TimeStamp: ");
     Serial.print(micros());
     Serial.println(": Starting Hcell! ");
-    digitalWrite(PIN_cutoff, HIGH);      // open cut-off
-    digitalWrite(PIN_startHcell, HIGH);  // start H-Cell
+    digitalWrite(PIN_cutoff, HIGH);     // open cut-off
+    digitalWrite(PIN_startHcell, LOW);  // start H-Cell         !!! LOW: 12V -- HIGH: 0V
     state.Hcell = 1;
   }
 }
@@ -96,8 +99,8 @@ void stop_Hcell() {
     Serial.print("TimeStamp: ");
     Serial.print(micros());
     Serial.println(" stopping Hcell! ");
-    digitalWrite(PIN_cutoff, LOW);      // close cut-off
-    digitalWrite(PIN_startHcell, LOW);  // turn off H-Cell
+    digitalWrite(PIN_cutoff, LOW);       // close cut-off
+    digitalWrite(PIN_startHcell, HIGH);  // turn off H-Cell       !!! LOW: 12V -- HIGH: 0V
     state.Hcell = 0;
   }
 }
