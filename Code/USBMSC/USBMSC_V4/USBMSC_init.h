@@ -113,11 +113,31 @@ states USB_state;
         HWSerial.println("UNKNOWN");
     }
   }
-//---------------------------------------------------------------------------------------------------------------
-// SD Card refresh:
 
-  void refreshSDCard(){       // refreshes SD Card after new file has been written from ESP32
-    
+//---------------------------------------------------------------------------------------------------------------
+// MSC init:
+
+  void initMSC(){
+    msc.vendorID("ESP32S3");
+    msc.productID("USB_MSC");
+    msc.productRevision("1.0");
+    msc.onRead(onRead);
+    msc.onWrite(onWrite);
+    msc.onStartStop(onStartStop);
+    msc.mediaPresent(true);
+    msc.begin(SD.numSectors(), 512);     //msc.begin(SD.numSectors(), SD.cardSize() / SD.numSectors() );
+  }
+
+
+//---------------------------------------------------------------------------------------------------------------
+// MSC refresh:
+
+  void refreshMSC(){       // refreshes SD Card after new file has been written from ESP32
+    msc.mediaPresent(false);
+    delay(500);
+    HWSerial.println("refreshing USB Mass Storage ...");
+    msc.mediaPresent(true);
+    delay(500);
   }
 
 #endif

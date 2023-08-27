@@ -1,6 +1,12 @@
 
 /*  Description:     This file connects to an SD Card over SPI and uses this SD Card to create a Mass Storage Device which can be accessed via USB from a Computer.
 *   Author:          Jonas Geckle
+*   
+*   Settings:
+*       USB CDC On Boot: "Enabled"
+*       USB Firmware MSC On Boot: "Disabled"
+*       Upload Mode: UART0 / Hardware CDC
+*       USB Mode: "USB-OTG (Tiny-USB)"
 */
 
 /* todo:
@@ -23,7 +29,6 @@
 
 //------------------------------------------------------------------------------------------------
   // use USBSerial and HWSerial as in: Examples > Examples for ESP32S3 Dev Module > USB > USBMSC
-  // -- might not be necessary --
   #if ARDUINO_USB_CDC_ON_BOOT
   #define HWSerial Serial0
   #define USBSerial Serial
@@ -33,12 +38,11 @@
   #endif
 //------------------------------------------------------------------------------------------------
 
+USBMSC msc;     // mass storage object
+
 #include "file_handling.h"
 #include "USBMSC_init.h"
 
-USBMSC msc;
-
-bool sd_changed = false;
 bool sd_inited = false;
 bool testwrite = true;
 
@@ -55,39 +59,22 @@ void setup() {
   while (!HWSerial && ( millis() < time + 5000) ); // wait up to 5 seconds for Arduino HWSerial Monitor
   HWSerial.println("");
 
-  // pinMode(MicroSD_SPI_CS, OUTPUT);
-  // digitalWrite(MicroSD_SPI_CS, LOW);
-
   initSDCard();
-
-  msc.vendorID("ESP32S3");
-  msc.productID("USB_MSC");
-  msc.productRevision("1.0");
-  msc.onRead(onRead);
-  msc.onWrite(onWrite);
-  msc.onStartStop(onStartStop);
-  msc.mediaPresent(true);
-  msc.begin(SD.numSectors(), 512);     //msc.begin(SD.numSectors(), SD.cardSize() / SD.numSectors() );
+  initMSC();
 
   USBSerial.begin();
   USB.begin();
 
-
+  // list initial contents of SD-Card
   HWSerial.println();
   listDir(SD, "/", 0);
   HWSerial.println();
-  sd_changed = false;
 }
 
 void loop() {
 
   if( USB_state == PLUGGED ){
     // do nothing and wait for disconnect
-    // options to disconnect:
-    // - physical disconnect of cable
-    // - disconnect interrupt because of new file to write
-    // - disconnect interrupt because mesuarement has started
-    // ???
   }
   else if( USB_state == UNPLUGGED ){
     // write new file(s) to SD-card and reconnect USB
@@ -95,35 +82,18 @@ void loop() {
 
 
 
-
-
-  if ( sd_changed ){
-    HWSerial.println();
-    listDir(SD, "/", 0);
-    HWSerial.println();
-
-    sd_changed = false;
-  }
-
   if( testwrite ){
     writeFile(SD, "/Hello_World.txt", "Hello World!");
     writeFile(SD, "/Hello_World2.txt", "Hello World2!");
     appendFile(SD, "/Hello_World.txt", "\nTest");
-    sd_changed = true;
     testwrite = false;
   }
 
   // write a new test-file after 20 sec
   if(counter == 20){
     writeFile(SD, "/Test.txt", "Test\n1234");
-    sd_changed = true;
 
-    // refresh USB-connection, that newly written file shows up in Explorer
-    msc.mediaPresent(false);
-    delay(500);
-    HWSerial.println("refreshing USB Mass Storage ...");
-    msc.mediaPresent(true);
-    delay(500);
+    refreshMSC();   // contains a total delay of 1 second !
   }
   
   counter++;
