@@ -3,7 +3,6 @@
 Description:      This File contains the main logic for controlling the testbench, the H2-Cell and the Sensors.
                   Also the communication via usb and the storage of the recorded sensor values.
 Authors:          Jonas Geckle, Tim Ruf
-Last edited:      06.08.2023
 Planned features: - sensor class containing all sensors -> easy use, modular
                   - sensor data capture using the sensor class
                   - data Storage on SD-Card
@@ -18,8 +17,10 @@ Planned features: - sensor class containing all sensors -> easy use, modular
 #define PIN_cutoff 5          // Gate 2 MOSFET to cut-off and flowsensor (24 V)
 #define PIN_recording 18      // recording-switch
 #define PIN_leaksensor 15     // leaksensor analog in
-#define PIN_flowsensor 16     // flowsensor analog in
-#define PIN_emergencystop 17  // emergency-stop
+//#define PIN_flowsensor 16     // flowsensor analog in
+//#define PIN_emergencystop 17  // emergency-stop
+#define PIN_HCELL_RX 16
+#define PIN_HCELLTX 17
 #define PIN_start 18          // start-stop-switch
 
 int upper_leaklimit = 25;  // todo: correct values
@@ -36,23 +37,27 @@ struct switches {
 };
 
 struct switches state;
+HardwareSerial SerialH(2);  //Using Serial2
 
 void setup_pins();
 void setup_state();
 void start_Hcell();
 void stop_Hcell();
 void update_state();
+void requestSerialInfo();
+void readSerial();
 
 void setup() {
   Serial.begin(9600);
   Serial.println("Booting H2-Testbench");
+  SerialH.begin(115200, SERIAL_8N1, 16, 17);
   setup_pins();
   setup_state();
 }
 
 void loop() {
   update_state();
-
+  requestSerialInfo();
 
   //H-Cell control logic
   if (state.leakvalue >= upper_leaklimit)  // leak-value exceeds limit -> danger of explosion
@@ -129,4 +134,35 @@ void update_state() {
   // state.leakvalue = analogRead(PIN_leaksensor);
   state.leakvalue = 5;  // temp. placeholder
   state.flowvalue = analogRead(PIN_flowsensor);
+}
+
+//Serial Communication
+//Temporary function for testing
+//this functions sends a command via Serial2 to the hcell to get basic information
+//triggered via PC by the serial monitor. Enter the commands below to send request to hcell
+void requestSerialInfo(){
+
+  if (Serial.available()) {
+    String cmd = Serial.readStringUntil('\n');
+
+    if (cmd == "idn") {
+      Serial.print("\nRetrieving Serialnumber... ");
+      SerialH.print("*Idn?\n");
+    } else if (cmd == "vol") {
+      Serial.print("\nRetrieving voltage... ");
+      SerialH.print("*Vol?\n");
+    } else if (cmd == "amp") {
+      Serial.print("\nRetrieving amperage... ");
+      SerialH.print("*Amp?\n");
+    }
+  }
+
+  readSerial();
+}
+
+void readSerial(){
+  if (SerialH.available()){
+    char tmp = SerialH.read();
+    Serial.print(String(tmp));
+  }
 }
