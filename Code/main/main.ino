@@ -15,12 +15,12 @@ Planned features: - sensor class containing all sensors -> easy use, modular
 
 #define PIN_startHcell 4      // Gate 1 MOSFET to start-pin H-Cell (12 V)
 #define PIN_cutoff 5          // Gate 2 MOSFET to cut-off and flowsensor (24 V)
-#define PIN_recording 18      // recording-switch
-#define PIN_leaksensor 15     // leaksensor analog in
-//#define PIN_flowsensor 16     // flowsensor analog in
-//#define PIN_emergencystop 17  // emergency-stop
-#define PIN_HCELL_RX 16
-#define PIN_HCELLTX 17
+#define PIN_recording 23      // recording-switch
+#define PIN_leaksensor 98     // leaksensor analog in
+#define PIN_flowsensor 15     // flowsensor analog in
+#define PIN_emergencystop 99  // emergency-stop
+#define PIN_RX 16
+#define PIN_TX 17
 #define PIN_start 18          // start-stop-switch
 
 int upper_leaklimit = 25;  // todo: correct values
@@ -50,7 +50,7 @@ void readSerial();
 void setup() {
   Serial.begin(9600);
   Serial.println("Booting H2-Testbench");
-  SerialH.begin(115200, SERIAL_8N1, 16, 17);
+  SerialH.begin(9600, SERIAL_8N1, PIN_RX, PIN_TX);
   setup_pins();
   setup_state();
 }
@@ -84,7 +84,7 @@ void setup_pins() {
   pinMode(PIN_emergencystop, INPUT_PULLDOWN);
   pinMode(PIN_start, INPUT_PULLDOWN);  // pull-down --> unpressed == low
 
-  digitalWrite(PIN_startHcell, HIGH);     // to 12 V switch 
+  digitalWrite(PIN_startHcell, LOW);     // to 12 V switch 
   digitalWrite(PIN_cutoff, LOW);          // to 24 V switch
 }
 
@@ -94,7 +94,7 @@ void start_Hcell() {
     Serial.print(micros());
     Serial.println(": Starting Hcell! ");
     digitalWrite(PIN_cutoff, HIGH);     // open cut-off
-    digitalWrite(PIN_startHcell, LOW);  // start H-Cell         !!! LOW: 12V -- HIGH: 0V
+    digitalWrite(PIN_startHcell, HIGH);  // start H-Cell
     state.Hcell = 1;
   }
 }
@@ -105,7 +105,7 @@ void stop_Hcell() {
     Serial.print(micros());
     Serial.println(" stopping Hcell! ");
     digitalWrite(PIN_cutoff, LOW);       // close cut-off
-    digitalWrite(PIN_startHcell, HIGH);  // turn off H-Cell       !!! LOW: 12V -- HIGH: 0V
+    digitalWrite(PIN_startHcell, LOW);  // turn off H-Cell       !!! LOW: 12V -- HIGH: 0V
     state.Hcell = 0;
   }
 }
@@ -132,7 +132,7 @@ void update_state() {
 
   //Update sensor values will be moved to own function!
   // state.leakvalue = analogRead(PIN_leaksensor);
-  state.leakvalue = 5;  // temp. placeholder
+  state.leakvalue = 5;  // temporary placeholder
   state.flowvalue = analogRead(PIN_flowsensor);
 }
 
@@ -147,13 +147,19 @@ void requestSerialInfo(){
 
     if (cmd == "idn") {
       Serial.print("\nRetrieving Serialnumber... ");
-      SerialH.print("*Idn?\n");
+      SerialH.print("*Idn? \n");
     } else if (cmd == "vol") {
       Serial.print("\nRetrieving voltage... ");
-      SerialH.print("*Vol?\n");
+      SerialH.print("*vol?\r");   
     } else if (cmd == "amp") {
       Serial.print("\nRetrieving amperage... ");
-      SerialH.print("*Amp?\n");
+      SerialH.print("*amp?\r");
+    } else if (cmd == "tmp"){
+      Serial.print("\nRetrieving temperatur... ");
+      SerialH.print("*temp?\r");
+    } else if (cmd == "flow"){
+      Serial.print("\nflowvalue:");
+      Serial.println(state.flowvalue);
     }
   }
 

@@ -1,16 +1,22 @@
 #ifndef USBMSC_INIT_H
 #define USBMSC_INIT_H
 
-/*  Description:      contains USB callback functions and SD Card init-function
+/*  Description:      file contains the following functions:
+*                       - USB callback functions
+*                       - SD Card init
+*                       - Mass Storage init
+*                       - Mass Storage refresh
 *   Author:           Jonas Geckle
 */
-
 
 enum states {
   PLUGGED, UNPLUGGED, SUSPENDED, RESUMED
 };
 
 states USB_state;
+USBMSC MS;                      // Mass Storage Object
+bool sd_changed = false;        // set to true after writing new content to the SD-Card
+int timestamp_refreshMS = 0;    // to measure a delay of 500 ms   --    '0' indicates that no refresh process is active
 
 //---------------------------------------------------------------------------------------------------------------
 // USB callback functions:
@@ -22,6 +28,7 @@ states USB_state;
   }
 
   static int32_t onRead(uint32_t lba, uint32_t offset, void* buffer, uint32_t bufsize){
+    // triggered when PC reads MSC
     // HWSerial.printf("MSC READ: lba: %u, offset: %u, bufsize: %u\n", lba, offset, bufsize);
     return SD.readRAW( (uint8_t*) buffer, lba) ? 512 : -1 ;
   }
@@ -115,29 +122,45 @@ states USB_state;
   }
 
 //---------------------------------------------------------------------------------------------------------------
-// MSC init:
+// Mass Storage init:
 
-  void initMSC(){
-    msc.vendorID("ESP32S3");
-    msc.productID("USB_MSC");
-    msc.productRevision("1.0");
-    msc.onRead(onRead);
-    msc.onWrite(onWrite);
-    msc.onStartStop(onStartStop);
-    msc.mediaPresent(true);
-    msc.begin(SD.numSectors(), 512);     //msc.begin(SD.numSectors(), SD.cardSize() / SD.numSectors() );
+  void initMS(){
+    MS.vendorID("ESP32S3");
+    MS.productID("USB_MSC");
+    MS.productRevision("1.0");
+    MS.onRead(onRead);
+    MS.onWrite(onWrite);
+    MS.onStartStop(onStartStop);
+    MS.mediaPresent(true);
+    MS.begin(SD.numSectors(), SD.cardSize() / SD.numSectors() );
   }
 
-
 //---------------------------------------------------------------------------------------------------------------
-// MSC refresh:
+// Mass Storage refresh:
 
-  void refreshMSC(){       // refreshes SD Card after new file has been written from ESP32
-    msc.mediaPresent(false);
-    delay(500);
-    HWSerial.println("refreshing USB Mass Storage ...");
-    msc.mediaPresent(true);
-    delay(500);
+  void refreshMS(){       
+    /*  refreshes SD Card after new file has been written from ESP32
+    *   process for a newly written file to appear on the connected device (e.g. PC):
+    *   - write the file when Mass Storage is connected
+    *   - disconnect MS by calling MS.mediPresent(false)
+    *   - keep disconnected for at least 500 ms
+    *   - reconnect MS by calling MS.mediaPresent(true)
+    */
+
+    // disconnect Mass Storage
+    if( sd_changed && (timestamp_refreshMS == 0) ){
+      HWSerial.println("resfresh start...");
+      MS.mediaPresent(false);
+      timestamp_refreshMS = micros();
+      sd_changed = false;
+    }
+
+    // reconnect Mass Storage after 500 ms
+    if( (timestamp_refreshMS + 500000) >= micros() ){
+      HWSerial.println("resfresh stop...");
+      MS.mediaPresent(true);
+      timestamp_refreshMS = 0;        // to indicate that the refresh process is finished
+    }
   }
 
 #endif
