@@ -147,19 +147,25 @@ void requestSerialInfo(){
 
     if (cmd == "idn") {
       Serial.print("\nRetrieving Serialnumber... ");
-      SerialH.print("*Idn? \n");
+      SerialH.print("*idn?\r\n");
     } else if (cmd == "vol") {
       Serial.print("\nRetrieving voltage... ");
-      SerialH.print("*vol?\r");   
+      SerialH.print("*vol?\r\n");   
     } else if (cmd == "amp") {
       Serial.print("\nRetrieving amperage... ");
-      SerialH.print("*amp?\r");
+      SerialH.print("*cur?\r\n");
     } else if (cmd == "tmp"){
       Serial.print("\nRetrieving temperatur... ");
-      SerialH.print("*temp?\r");
+      SerialH.print("*temp?\r\n");
+    } else if (cmd == "prs"){
+      Serial.print("\nRetrieving pressure... ");
+      SerialH.print("*pres?\r\n");
     } else if (cmd == "flow"){
       Serial.print("\nflowvalue:");
       Serial.println(state.flowvalue);
+    } else if (cmd == "err"){
+      Serial.print("\nError-Code: ");
+      SerialH.print("*error?\r\n");
     }
   }
 
