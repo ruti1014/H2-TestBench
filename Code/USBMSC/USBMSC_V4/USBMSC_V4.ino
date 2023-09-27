@@ -20,13 +20,21 @@
 //------------------------------------------------------------------------------------------------
   // define SPI Pins:
 
+  #define SPI_MOSI 41
+  #define SPI_MISO 42
+  #define SPI_SCK 40
+  #define MicroSD_SPI_CS 39
+  #define Display_SPI_CS 21
+
+  // ESP32-S3 standard SPI Pins:
+  /*
   #define SPI_MOSI 11
   #define SPI_MISO 13
   #define SPI_SCK 12
   #define MicroSD_SPI_CS 10
+  */
 
 //------------------------------------------------------------------------------------------------
-  // use USBSerial and HWSerial as in: Examples > Examples for ESP32S3 Dev Module > USB > USBMSC
   #if ARDUINO_USB_CDC_ON_BOOT
   #define HWSerial Serial0
   #define USBSerial Serial
@@ -49,10 +57,6 @@ void setup() {
 
   USB.onEvent(usbEventCallback);
 
-  // long time = millis();
-  // while (!HWSerial && ( millis() < time + 5000) ); // wait up to 5 seconds for Arduino HWSerial Monitor
-  // HWSerial.println("");
-
   initSDCard();
   initMS();
 
@@ -64,6 +68,7 @@ void setup() {
   listDir(SD, "/", 0);
   HWSerial.println();
 
+  delay(5000);
 }
 
 void loop() {

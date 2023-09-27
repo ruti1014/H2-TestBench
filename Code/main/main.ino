@@ -149,16 +149,16 @@ void requestSerialInfo(){
       Serial.print("\nRetrieving Serialnumber... ");
       SerialH.print("*idn?\r\n");
     } else if (cmd == "vol") {
-      Serial.print("\nRetrieving voltage... ");
+      Serial.print("\nVoltage (in mV): ");
       SerialH.print("*vol?\r\n");   
     } else if (cmd == "amp") {
-      Serial.print("\nRetrieving amperage... ");
+      Serial.print("\nCurrent (in mA): ");
       SerialH.print("*cur?\r\n");
     } else if (cmd == "tmp"){
-      Serial.print("\nRetrieving temperatur... ");
+      Serial.print("\nTemperature (in °C): ");
       SerialH.print("*temp?\r\n");
     } else if (cmd == "prs"){
-      Serial.print("\nRetrieving pressure... ");
+      Serial.print("\nPressure (in mbar): ");
       SerialH.print("*pres?\r\n");
     } else if (cmd == "flow"){
       Serial.print("\nflowvalue:");

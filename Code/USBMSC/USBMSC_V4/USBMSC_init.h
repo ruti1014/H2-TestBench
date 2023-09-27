@@ -72,16 +72,19 @@ int timestamp_refreshMS = 0;    // to measure a delay of 500 ms   --    '0' indi
   void initSDCard(){
     // new SPI Class Object:
     static SPIClass* spi = NULL;
-    spi = new SPIClass(FSPI);
+    spi = new SPIClass(HSPI);       // using SPI2
     spi->begin(SPI_SCK, SPI_MISO, SPI_MOSI, MicroSD_SPI_CS);
 
     // init SD Class with SPI Class Object:
     if ( !SD.begin( MicroSD_SPI_CS, *spi, 20000000 ) ){
-      HWSerial.println(F("Storage initialization failed"));
-      HWSerial.println("Stopped");
-      while(1);
+      HWSerial.print(F("Storage initialization failed, "));
+      HWSerial.println("restarting...");
+      ESP.restart();
+
+      // HWSerial.println("Stopped");
+      // while(1);
     }
-    else{
+    else{       
       HWSerial.println(F("Storage initialization success"));
     }
 
@@ -156,7 +159,7 @@ int timestamp_refreshMS = 0;    // to measure a delay of 500 ms   --    '0' indi
     }
 
     // reconnect Mass Storage after 500 ms
-    if( (timestamp_refreshMS + 500000) >= micros() ){
+    if( (timestamp_refreshMS != 0) && micros() >= (timestamp_refreshMS + 500000) ){
       HWSerial.println("resfresh stop...");
       MS.mediaPresent(true);
       timestamp_refreshMS = 0;        // to indicate that the refresh process is finished
