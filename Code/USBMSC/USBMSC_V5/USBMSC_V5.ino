@@ -8,23 +8,25 @@
 *       USB Mode: "USB-OTG (Tiny-USB)"
 */
 
-/* todo:
-    - SD-card refresh after new file has been written
-*/
+// USBMSC + SPI-Display
 
 #include <SD.h>
 #include <SPI.h>
 #include <USB.h>
 #include <USBMSC.h>
+#include <TFT_22_ILI9225.h>
 
 //------------------------------------------------------------------------------------------------
   // define SPI Pins:
 
-  #define SPI_MOSI 41
-  #define SPI_MISO 42
+  #define SPI_MOSI 41     // Display_SDI
+  #define SPI_MISO 42     // Display_RS
   #define SPI_SCK 40
   #define MicroSD_SPI_CS 39
   #define Display_SPI_CS 21
+
+  #define Display_LED 0   // 0 if wired to +5V directly
+  //#define Display_BRIGHTNESS 200 // Initial brightness of TFT backlight (optional)
 
   // ESP32-S3 standard SPI Pins:
   /*
@@ -45,6 +47,8 @@
 //------------------------------------------------------------------------------------------------
 
 #include "file_handling.h"
+#include "LogoHEK_white_on_black.h"
+#include "LogoHEK_black_on_white.h"
 #include "USBMSC_init.h"
 
 bool sd_inited = false;
@@ -56,7 +60,8 @@ void setup() {
   HWSerial.setDebugOutput(true);
 
   USB.onEvent(usbEventCallback);
-
+  
+  initDisplay();
   initSDCard();
   initMS();
 

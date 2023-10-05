@@ -9,12 +9,13 @@
 #include <Arduino.h>
 #include <arduino-timer.h>
 
-// ESP32-S3 Pins
-#define comPin 3
-#define channelA 14
-#define channelB 35
-#define channelC 47
+// define Multiplexer Pins:   (ESP32-S3 Pins)
+  #define comPin 3
+  #define channelA 14
+  #define channelB 35
+  #define channelC 47
 
+//
 #if ARDUINO_USB_CDC_ON_BOOT
 #define HWSerial Serial0
 #define USBSerial Serial
@@ -39,10 +40,12 @@ auto timer = timer_create_default();
 void setup() {
   HWSerial.begin(9600);
   HWSerial.println("setup");
+
   pinMode(channelA, OUTPUT);
   pinMode(channelB, OUTPUT); 
   pinMode(channelC, OUTPUT); 
   pinMode(comPin, INPUT_PULLDOWN);
+
   digitalWrite(channelA, LOW);
   digitalWrite(channelB, HIGH);
   digitalWrite(channelC, LOW);
