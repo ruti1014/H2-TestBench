@@ -26,6 +26,7 @@
   #define MicroSD_SPI_CS 39
   #define Display_SPI_CS 21
 
+  #define TFT_RST 48
   #define Display_LED 0   // 0 if wired to +5V directly
   //#define Display_BRIGHTNESS 200 // Initial brightness of TFT backlight (optional)
 
@@ -59,8 +60,7 @@
 //------------------------------------------------------------------------------------------------
 
 #include "file_handling.h"
-#include "LogoHEK_white_on_black.h"
-#include "LogoHEK_black_on_white.h"
+#include "LogoHEK.h"
 #include "USBMSC_init.h"
 #include "Multiplexer_init.h"
 #include "Display_init.h"
