@@ -1,48 +1,29 @@
 #include "Sensor.h"
-//Dependencies
-#include <Adafruit_BME280.h>
+
 
 //Sensor class implementation
-Sensor::Sensor(int dataQuantity)
-  : _dataQuantity(dataQuantity) {}
+Sensor::Sensor(String name, int dataQuantity)
+  : _sensorName(name), _dataQuantity(dataQuantity) {}
+
 int Sensor::getDataQuantity() {
   return _dataQuantity;
 }
 
-void Sensor::getSensorData(SensorData* dataPtr, int index) {
+String Sensor::getSensorName() {
+  return _sensorName;
+}
+
+SensorData* Sensor::getSensorData(int index) {
+  SensorData* dataPtr = NULL;
   if (_dataQuantity > 0) {
-    dataPtr = _data + sizeof(SensorData) * _dataQuantity;  //return pointer to element with index
+    dataPtr = _data + index;  //return pointer to element with index
   } else {
     dataPtr = _data;
   }
+
+  return dataPtr;
 }
 
-
-
-//BmeSensor class implementation
-BmeSensor::BmeSensor(int address, String name) {
-  _dataQuantity = 3;  //BME280 is measuring temp/hum/pres -> 3 values
-
-  //Create data Structs
-  _data = new SensorData[3];
-  //Todo fill in structs
-
-
-  //Start
-  _bme.begin(address);
-}
-double BmeSensor::getValue() {
-  return _bme.readTemperature();
-}
-double BmeSensor::readValue() {
-}
-double BmeSensor::updateValue(double val) {}
-
-//Generic analogSensorClass implementation
-AnalogSensor::AnalogSensor(int pin) {}
-double AnalogSensor::getValue() {}
-double AnalogSensor::readValue() {}
-double AnalogSensor::updateValue(double val) {}
 
 
 //SensorArray
@@ -67,18 +48,30 @@ bool SensorArray::addSensor(Sensor* sensor) {
 
   //Add sensor value struct to list
   int sensorDataAmount = sensor->getDataQuantity();
-
-  if ((_dataIndex + _sensorAmount < _dataAmount) && sensorAddSucces) {
+  if ((_dataIndex < _dataAmount) && sensorAddSucces) {
     for (int i = 0; i < sensorDataAmount; i++) {
       //Todo: populate _dataList with SensorData structs from sensor
+      SensorData* data = NULL;
+      data = sensor->getSensorData(i);
+      _dataList[_dataIndex + i] = *data;
     }
-    _dataIndex + sensorDataAmount;
+    _dataIndex += sensorDataAmount;
   }
 
   return (sensorAddSucces && dataAddSucces);
 }
 
 void SensorArray::updateSensorValues() {
+  for (int i = 0; i < _sensorIndex; i++) {
+    _sensorList[i]->update();
+  }
 }
 
-double SensorArray::returnSensorValue(){};
+String SensorArray::getSensorList() {
+  String sensorString;
+  for (int i = 0; i < _sensorIndex; i++) {
+    if (i < _sensorIndex - 1) sensorString += _sensorList[i]->getSensorName() + ", ";
+    else sensorString += _sensorList[i]->getSensorName();
+  }
+  return sensorString;
+}
