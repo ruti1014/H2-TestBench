@@ -80,7 +80,7 @@ void setup() {
 
   USB.onEvent(usbEventCallback);
   
-  initDisplay();
+  // initDisplay();
   initSDCard();
   initMS();
 
