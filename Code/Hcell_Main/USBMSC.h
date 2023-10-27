@@ -75,6 +75,8 @@ void initSDCard(){
   if ( !SD.begin( MicroSD_SPI_CS, *MicroSD_SPI, 20000000 ) ){
     HWSerial.print(F("Storage initialization failed, "));
 
+    // TO-DO
+
     // restart automatically
     HWSerial.println("restarting...");
     ESP.restart();

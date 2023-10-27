@@ -32,6 +32,10 @@ void setup() {
   String tmp = sensorArray.getSensorList();
   Serial.println(tmp);
 
+  // uint16_t tmpData;
+  // for(int i=0; i<sensorArray.getDataQuantity(); i++){
+  //   tmpData = sensorArray.getData(i).value;
+  // }
 }
 
 void loop() {}

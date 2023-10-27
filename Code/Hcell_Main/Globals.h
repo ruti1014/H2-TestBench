@@ -8,6 +8,14 @@ bool stopHcell();
 void recording();
 void buttonInterpreter(int, int);
 
+// enum SensorType;
+// struct SensorData;
+
+// class Sensor;
+// class SensorArray;
+// class AnalogSensor;
+// class BmeSensor;
+// class HCell;
 
 
 
@@ -37,3 +45,12 @@ struct directionalPad{
 Preferences preferences;
 HardwareSerial SerialHCELL(2);  //Using Serial2
 struct directionalPad dPad;
+
+//create sensor objects
+AnalogSensor h2flow(PIN_flowsensor, "h2flow", SENS_H2FLOW);
+AnalogSensor h2leak(PIN_leaksensor, "h2leak", SENS_H2LEAK);
+BmeSensor bme1(0x76, "bme1");
+BmeSensor bme2(0x77, "bme2");
+
+//create sensor array
+SensorArray sensorArray(4, 6);  //Amount of sensors, amount of captuered data

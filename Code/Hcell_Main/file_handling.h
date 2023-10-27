@@ -172,7 +172,7 @@ void appendCSV(fs::FS &fs, uint32_t *fileIndex, int bufSize) {
   for (int j = 0; j < bufSize; j++) {
     // get next row
     for (int i = 0; i < numSensors; i++) {
-      data = "";  //TO-DO add data to line
+      data = i;  //TO-DO add data to line
       appendix += data + ";";
     }
     appendix += "\n";

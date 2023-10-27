@@ -68,12 +68,17 @@ USBCDC USBSerial;
 #include <TFT_22_ILI9225.h>
 #include <Preferences.h>
 
+// TO-DO: move below Globals.h
+#include "Sensor.h"
+#include "CustomSensor.h"
+
 #include "Globals.h"
 #include "file_handling.h"
 #include "LogoHEK.h"
 #include "USBMSC.h"
 #include "Multiplexer.h"
 #include "Display_init.h"
+
 #include "Utilities.h"
 
 
