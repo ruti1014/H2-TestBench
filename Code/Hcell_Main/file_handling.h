@@ -1,3 +1,4 @@
+#include "soc/uart_struct.h"
 /*  ----------- file_handling.h -----------
 *   Author: Jonas Geckle
 *   Institution: Hochschule Karlsruhe
@@ -7,15 +8,15 @@
 #ifndef FILE_HANDLING_H
 #define FILE_HANDLING_H
 
-void writeFile(fs::FS &fs, const char * path, const char * message){
+void writeFile(fs::FS &fs, const char *path, const char *message) {
   HWSerial.printf("Writing file: %s\n", path);
 
   File file = fs.open(path, FILE_WRITE);
-  if(!file){
+  if (!file) {
     debugprintln("Failed to open file for writing");
     return;
   }
-  if(file.print(message)){
+  if (file.print(message)) {
     debugprintln("File written");
   } else {
     debugprintln("Write failed");
@@ -23,17 +24,17 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
   file.close();
 }
 
-void appendFile(fs::FS &fs, const char * path, const char * message){
+void appendFile(fs::FS &fs, const char *path, const char *message) {
   HWSerial.printf("Appending to file: %s\n", path);
 
   File file = fs.open(path, FILE_APPEND);
 
-  if(!file){
+  if (!file) {
     debugprintln("Failed to open file for appending");
     return;
   }
-  
-  if(file.print(message)){
+
+  if (file.print(message)) {
     debugprintln("Message appended");
   } else {
     debugprintln("Append failed");
@@ -42,60 +43,60 @@ void appendFile(fs::FS &fs, const char * path, const char * message){
   file.close();
 }
 
-void readFile(fs::FS &fs, const char * path){
+void readFile(fs::FS &fs, const char *path) {
   HWSerial.printf("Reading file: %s\n", path);
 
   File file = fs.open(path);
-  if(!file){
+  if (!file) {
     debugprintln("Failed to open file for reading");
     return;
   }
 
   debugprint("Read from file: ");
-  while(file.available()){
+  while (file.available()) {
     HWSerial.write(file.read());
   }
   file.close();
 }
 
-void removeDir(fs::FS &fs, const char * path){
+void removeDir(fs::FS &fs, const char *path) {
   HWSerial.printf("Removing Dir: %s\n", path);
-  if(fs.rmdir(path)){
+  if (fs.rmdir(path)) {
     debugprintln("Dir removed");
   } else {
     debugprintln("rmdir failed");
   }
 }
 
-void createDir(fs::FS &fs, const char * path){
+void createDir(fs::FS &fs, const char *path) {
   HWSerial.printf("Creating Dir: %s\n", path);
-  if(fs.mkdir(path)){
+  if (fs.mkdir(path)) {
     debugprintln("Dir created");
   } else {
     debugprintln("mkdir failed");
   }
 }
 
-void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
+void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
   HWSerial.printf("Listing directory: %s\n", dirname);
 
   File root = fs.open(dirname);
-  if(!root){
+  if (!root) {
     debugprintln("Failed to open directory");
     return;
   }
-  if(!root.isDirectory()){
+  if (!root.isDirectory()) {
     debugprintln("Not a directory");
     return;
   }
 
   File file = root.openNextFile();
-  while(file){
-    if(file.isDirectory()){
+  while (file) {
+    if (file.isDirectory()) {
       debugprint("  DIR : ");
       debugprintln(file.name());
-      if(levels){
-        listDir(fs, file.name(), levels -1);
+      if (levels) {
+        listDir(fs, file.name(), levels - 1);
       }
     } else {
       debugprint("  FILE: ");
@@ -103,11 +104,11 @@ void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
       debugprint("  SIZE: ");
       debugprintln(file.size());
     }
-     file = root.openNextFile();
+    file = root.openNextFile();
   }
 }
 
-void renameFile(fs::FS &fs, const char * path1, const char * path2){
+void renameFile(fs::FS &fs, const char *path1, const char *path2) {
   HWSerial.printf("Renaming file %s to %s\n", path1, path2);
   if (fs.rename(path1, path2)) {
     debugprintln("File renamed");
@@ -116,17 +117,20 @@ void renameFile(fs::FS &fs, const char * path1, const char * path2){
   }
 }
 
-void deleteFile(fs::FS &fs, const char * path){
+void deleteFile(fs::FS &fs, const char *path) {
   HWSerial.printf("Deleting file: %s\n", path);
-  if(fs.remove(path)){
+  if (fs.remove(path)) {
     debugprintln("File deleted");
   } else {
     debugprintln("Delete failed");
   }
 }
 
+
+
+
 // generates a new .csv-file with current fileIndex and saves it on fs, increments fileIndex by 1
-void writeCSV(fs::FS &fs, uint32_t * fileIndex){
+void createCSV(fs::FS &fs, uint32_t *fileIndex) {
   // get file path
   String name = "/H2TestBench_recording_";
   String indexStr = String(*fileIndex);
@@ -138,18 +142,18 @@ void writeCSV(fs::FS &fs, uint32_t * fileIndex){
   path.toCharArray(pathChar, pathLen);
 
   // write file
-  writeFile(fs, pathChar, "Temperature;Pressure;Humidity;Flow;Leak;\n");
+  writeFile(fs, pathChar, "Temperature;Pressure;Humidity;Flow;Leak;\n");  //TO-DO implement SensorClass
   *fileIndex = *fileIndex + 1;
 }
 
 // appends newest sensor data to .csv-file
-void appendCSV(fs::FS &fs, uint32_t * fileIndex, int position, int bufSize){
+void appendCSV(fs::FS &fs, uint32_t *fileIndex, int bufSize) {
   String data = "";
   String appendix = "";
-  
+
   // get file path
   String name = "/H2TestBench_recording_";
-  String indexStr = String((*fileIndex) - 1);     // to get current fileIndex
+  String indexStr = String((*fileIndex) - 1);  // to get current fileIndex
   String format = ".csv";
   String path = name + indexStr + format;
 
@@ -159,16 +163,16 @@ void appendCSV(fs::FS &fs, uint32_t * fileIndex, int position, int bufSize){
 
   // open file for appending
   File file = fs.open(pathChar, FILE_APPEND);
-  if(!file){
+  if (!file) {
     debugprintln("Failed to open file for appending");
     return;
   }
 
   // append new content
-  for(int j=position; j<(position+bufSize); j++){
+  for (int j = 0; j < bufSize; j++) {
     // get next row
-    for(int i=0; i<numSensors; i++){
-      data = ""; //TO-DO add data to line
+    for (int i = 0; i < numSensors; i++) {
+      data = "";  //TO-DO add data to line
       appendix += data + ";";
     }
     appendix += "\n";
@@ -178,7 +182,7 @@ void appendCSV(fs::FS &fs, uint32_t * fileIndex, int position, int bufSize){
     char appendixChar[appendixLen];
     appendix.toCharArray(appendixChar, appendixLen);
 
-    if(file.print(appendixChar)){
+    if (file.print(appendixChar)) {
       debugprintln("Message appended");
     } else {
       debugprintln("Append failed");

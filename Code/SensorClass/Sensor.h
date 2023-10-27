@@ -22,8 +22,10 @@ enum SensorType {
 //Sensor data Struct
 struct SensorData {
   String sensorName;
+  String unit;
   SensorType type;
-  double value;
+  uint16_t value;
+  int inverval; //interval in which the sensor is read
 };
 
 
@@ -50,6 +52,7 @@ public:
   bool addSensor(Sensor* sensor);
   void updateSensorValues();
   String getSensorList();
+  SensorData* getData(int i);
 
 private:
   Sensor** _sensorList;

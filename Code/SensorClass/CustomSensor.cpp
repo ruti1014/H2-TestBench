@@ -35,15 +35,19 @@ BmeSensor::BmeSensor(int address, String name)
   _data = new SensorData[3];
   _sensorName = name;
 
+  //populate datastruct
   _data[0].sensorName = _sensorName;
   _data[0].type = SENS_TEMP;
   _data[0].value = 0;
+  _data[2].inverval = 1;
   _data[1].sensorName = _sensorName;
   _data[1].type = SENS_PRESSURE;
   _data[1].value = 0;
+  _data[2].inverval = 1;
   _data[2].sensorName = _sensorName;
   _data[2].type = SENS_HUM;
   _data[2].value = 0;
+  _data[2].inverval = 1;
 
   //Start
   //_bme.begin(address); //To-do: Handle connection loss or connection timeout
@@ -66,6 +70,3 @@ double BmeSensor::getValue(SensorType sensorType) {
       tmp = _data[2].value;
   }
 }
-
-
-

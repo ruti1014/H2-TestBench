@@ -24,8 +24,6 @@ SensorData* Sensor::getSensorData(int index) {
   return dataPtr;
 }
 
-
-
 //SensorArray
 SensorArray::SensorArray(int sensorAmount, int dataAmount)
   : _sensorAmount(sensorAmount), _dataAmount(dataAmount) {
@@ -74,4 +72,10 @@ String SensorArray::getSensorList() {
     else sensorString += _sensorList[i]->getSensorName();
   }
   return sensorString;
+}
+
+SensorData* SensorArray::getData(int i) {
+  SensorData* temp = NULL;
+  if (i >= 0 && i < _dataIndex) *temp = _dataList[i];
+  return temp;
 }

@@ -14,7 +14,6 @@ BmeSensor bme1(0x76, "bme1");
 //create sensor array
 SensorArray sensorArray(4, 6);  //Amount of sensors, amount of captuered data
 
-
 void setup() {
   Serial.begin(115200);
   Serial.println("Start");
@@ -33,9 +32,6 @@ void setup() {
   String tmp = sensorArray.getSensorList();
   Serial.println(tmp);
 
-  SensorData* temp = NULL;
-  for (int i = 0; i < 3; i++) {
-  }
 }
 
 void loop() {}
