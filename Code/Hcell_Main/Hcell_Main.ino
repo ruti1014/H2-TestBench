@@ -102,4 +102,9 @@ void setup() {
 void loop() {
   recording();
   multiplexerLoop();  // reads buttons every 100ms
+
+  if(readSensorBuffer){
+    appendCSV(SD, recordingFileIndex, sensorBufferSize);
+    readSensorBuffer = false;
+  }
 }

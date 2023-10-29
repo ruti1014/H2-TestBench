@@ -113,3 +113,10 @@ void buttonInterpreter(int button, int value) {
       break;
   }
 }
+
+void addDataToBuffer(){
+    // uint16_t tmpData;
+  // for(int i=0; i<sensorArray.getDataQuantity(); i++){
+  //   tmpData = sensorArray.getData(i).value;
+  // }
+}

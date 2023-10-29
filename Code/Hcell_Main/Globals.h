@@ -7,6 +7,7 @@ bool startHcell();
 bool stopHcell();
 void recording();
 void buttonInterpreter(int, int);
+void addDataToBuffer();
 
 // enum SensorType;
 // struct SensorData;
@@ -23,6 +24,7 @@ void buttonInterpreter(int, int);
 //flags
 bool hCellState = false; //true == ON, false == OFF
 bool recordingFlag = false;
+bool readSensorBuffer = false;
 bool sd_inited = false;
 bool testwrite = true;      // to write the testfiles only once
 int counter = 0;            // to count 20 sec for the second write-test
@@ -31,6 +33,8 @@ bool button_pressed[8] = {false, false, false, false, false, false, false, false
 
 uint32_t recordingFileIndex = 0;   // index for .csv-files
 const char recordingKeyName[] = "recStorageKey";      // max. 15 chars
+
+uint16_t SensorBuffer[numData][sensorBufferSize];
 
 //structs
 struct directionalPad{
