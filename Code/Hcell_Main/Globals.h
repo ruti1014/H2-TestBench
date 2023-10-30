@@ -24,7 +24,7 @@ void addDataToBuffer();
 //flags
 bool hCellState = false; //true == ON, false == OFF
 bool recordingFlag = false;
-bool readSensorBuffer = false;
+bool appendBufferFlag = false;
 bool sd_inited = false;
 bool testwrite = true;      // to write the testfiles only once
 int counter = 0;            // to count 20 sec for the second write-test

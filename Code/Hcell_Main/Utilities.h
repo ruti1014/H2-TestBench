@@ -66,9 +66,11 @@ void recording() {
       connectMS(false);  //disconnect MS to prevent data corruption
       createCSV(SD, &recordingFileIndex);
     }
-    //TO-DO append flag when new data is available
-    if (true) appendCSV(SD, &recordingFileIndex, sensorBufferSize);
-
+    // append new data if available
+    if (appendBufferFlag){
+      appendCSV(SD, &recordingFileIndex, sensorBufferSize);
+      appendBufferFlag = false;
+    }
   } else {
     if (lastState != recordingFlag) {
       connectMS(true);  //connect MS to transfer recorded data
@@ -115,8 +117,17 @@ void buttonInterpreter(int button, int value) {
 }
 
 void addDataToBuffer(){
-    // uint16_t tmpData;
-  // for(int i=0; i<sensorArray.getDataQuantity(); i++){
-  //   tmpData = sensorArray.getData(i).value;
-  // }
+  static int bufferIndex = 0;
+  static uint16_t tmpSensorData = 0;
+
+  for(int i=0; i<numData; i++){
+    tmpSensorData = sensorArray.getData(i)->value;
+    SensorBuffer[i][bufferIndex] = tmpSensorData;
+  }
+
+  bufferIndex++;
+  if(bufferIndex == sensorBufferSize){
+    bufferIndex = 0;                // wrap around
+    appendBufferFlag = true;
+  }
 }
