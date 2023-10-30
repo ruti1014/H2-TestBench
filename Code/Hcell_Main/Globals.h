@@ -36,6 +36,9 @@ const char recordingKeyName[] = "recStorageKey";      // max. 15 chars
 
 uint16_t SensorBuffer[numData][sensorBufferSize];
 
+// TO-DO: maybe implement updateIntervall into SensorClass ?
+int updateIntervall = 100;    // sensor update intervall in ms
+
 //structs
 struct directionalPad{
   bool ok = false;

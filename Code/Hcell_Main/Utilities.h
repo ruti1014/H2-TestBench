@@ -119,15 +119,22 @@ void buttonInterpreter(int button, int value) {
 void addDataToBuffer(){
   static int bufferIndex = 0;
   static uint16_t tmpSensorData = 0;
+  static int time = millis();
 
-  for(int i=0; i<numData; i++){
-    tmpSensorData = sensorArray.getData(i)->value;
-    SensorBuffer[i][bufferIndex] = tmpSensorData;
-  }
-
-  bufferIndex++;
-  if(bufferIndex == sensorBufferSize){
-    bufferIndex = 0;                // wrap around
-    appendBufferFlag = true;
+  if(!appendBufferFlag){      // to prevent buffer override
+    if(millis() >= (time + updateIntervall))
+    {
+      // read current sensor data and write to buffer
+      for(int i=0; i<numData; i++){
+        tmpSensorData = sensorArray.getData(i)->value;
+        SensorBuffer[i][bufferIndex] = tmpSensorData;
+      }
+      bufferIndex++;
+      if(bufferIndex == sensorBufferSize){
+        bufferIndex = 0;                // wrap around
+        appendBufferFlag = true;
+      }
+      time = millis();
+    }
   }
 }

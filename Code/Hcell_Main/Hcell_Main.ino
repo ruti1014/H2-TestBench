@@ -102,8 +102,5 @@ void setup() {
 void loop() {
   recording();
   multiplexerLoop();  // reads buttons every 100ms
-
-  if(!appendBufferFlag){      // to prevent buffer override
-    addDataToBuffer();
-  }
+  addDataToBuffer();
 }
