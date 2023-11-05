@@ -131,7 +131,7 @@ void addDataToBuffer(){
       }
       bufferIndex++;
       if(bufferIndex == sensorBufferSize){
-        bufferIndex = 0;                // wrap around
+        bufferIndex = 0;      // wrap around
         appendBufferFlag = true;
       }
       time = millis();

@@ -2,7 +2,7 @@
 /*  ----------- file_handling.h -----------
 *   Author: Jonas Geckle
 *   Institution: Hochschule Karlsruhe
-*   Description: contains functions to read/write/etc. files to as file system
+*   Description: contains functions to read/write/etc. files to a file system
 */
 
 #ifndef FILE_HANDLING_H
@@ -126,9 +126,6 @@ void deleteFile(fs::FS &fs, const char *path) {
   }
 }
 
-
-
-
 // generates a new .csv-file with current fileIndex and saves it on fs, increments fileIndex by 1
 void createCSV(fs::FS &fs, uint32_t *fileIndex) {
   // get file path
@@ -136,13 +133,28 @@ void createCSV(fs::FS &fs, uint32_t *fileIndex) {
   String indexStr = String(*fileIndex);
   String format = ".csv";
   String path = name + indexStr + format;
-
   int pathLen = path.length() + 1;
   char pathChar[pathLen];
   path.toCharArray(pathChar, pathLen);
 
+  // get CSV header from sensor names and units
+  String tmpSensorName = "";
+  String tmpSensorUnit = "";
+  String headerCSV = "";
+
+  for(int i=0; i<numData; i++){
+    tmpSensorName = sensorArray.getData(i)->sensorName;
+    tmpSensorUnit = sensorArray.getData(i)->unit;
+    headerCSV += tmpSensorName + " (" + tmpSensorUnit + ");";
+  }
+  headerCSV += "\n";
+
+  int headerLen = headerCSV.length() + 1;
+  char headerChar[headerLen];
+  headerCSV.toCharArray(headerChar, headerLen);
+
   // write file
-  writeFile(fs, pathChar, "Temperature;Pressure;Humidity;Flow;Leak;\n");  //TO-DO implement SensorClass
+  writeFile(fs, pathChar, headerChar);
   *fileIndex = *fileIndex + 1;
 }
 
@@ -172,7 +184,7 @@ void appendCSV(fs::FS &fs, uint32_t *fileIndex, int bufSize) {
   for (int j = 0; j < bufSize; j++) {
     // get next row
     for (int i = 0; i < numSensors; i++) {
-      data = i;  //TO-DO add data to line
+      data = SensorBuffer[i][j];
       appendix += data + ";";
     }
     appendix += "\n";
