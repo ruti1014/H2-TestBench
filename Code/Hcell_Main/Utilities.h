@@ -21,12 +21,18 @@ void setupPreferences(){
 
 
   recordingFileIndex = preferences.getUInt(recordingKeyName, 0);  // get previous FileIndex (returns 0 if key doesn't exist)
+  restartCounter = preferences.getUInt(restartKeyName, 0);
 
-  if (recordingFileIndex == 0) {
+  if(recordingFileIndex == 0) {
     recordingFileIndex = 1;
     preferences.putUInt(recordingKeyName, recordingFileIndex);
   } else if (recordingFileIndex == 4294967295) {
     resetFileIndex();
+  }
+
+  if(restartCounter == 0){
+    restartCounter = 1;
+    preferences.putUInt(restartKeyName, restartCounter);
   }
 
 }
@@ -39,9 +45,14 @@ void resetFileIndex() {
   HWSerial.println(preferences.getUInt(recordingKeyName, 0));
 }
 
+void resetRestartCounter() {
+  restartCounter = 1;
+  preferences.putUInt(restartKeyName, restartCounter);
+}
+
 bool startHcell() {
   //TO-DO implement leaksensor limits
-  if (!hCellState) {
+  if(!hCellState) {
     HWSerial.println("Starting Hcell! ");
     digitalWrite(PIN_cutoff, HIGH);      // open cut-off
     digitalWrite(PIN_startHcell, HIGH);  // start H-Cell
@@ -50,7 +61,7 @@ bool startHcell() {
 }
 
 bool stopHcell() {
-  if (hCellState) {
+  if(hCellState) {
     HWSerial.println("Stopping Hcell! ");
     digitalWrite(PIN_cutoff, LOW);      // close cut-off
     digitalWrite(PIN_startHcell, LOW);  // turn off H-Cell
@@ -61,18 +72,18 @@ bool stopHcell() {
 void recording() {
   static bool lastState = recordingFlag;
 
-  if (recordingFlag) {
-    if (lastState != recordingFlag) {
+  if(recordingFlag) {
+    if(lastState != recordingFlag) {
       connectMS(false);  //disconnect MS to prevent data corruption
       createCSV(SD, &recordingFileIndex);
     }
     // append new data if available
-    if (appendBufferFlag){
+    if(appendBufferFlag){
       appendCSV(SD, &recordingFileIndex, sensorBufferSize);
       appendBufferFlag = false;
     }
   } else {
-    if (lastState != recordingFlag) {
+    if(lastState != recordingFlag) {
       connectMS(true);  //connect MS to transfer recorded data
     }
   }
@@ -84,31 +95,31 @@ void buttonInterpreter(int button, int value) {
   //value == 1 button pressed
   switch (button) {
     case 0:  //hcell start == 1, stop == 0
-      if (value == 1) startHcell();
+      if(value == 1) startHcell();
       else stopHcell();
       break;
     case 1:  //recording start == 1, stop == 0
-      if (value == 1) recordingFlag = true;
+      if(value == 1) recordingFlag = true;
       else recordingFlag = false;
       break;
     case 2:  //OK
-      if (value == 1) dPad.ok = true;
+      if(value == 1) dPad.ok = true;
       else dPad.ok = false;
       break;
     case 3:  //left
-      if (value == 1) dPad.left = true;
+      if(value == 1) dPad.left = true;
       else dPad.left = false;
       break;
     case 4:  //right
-      if (value == 1) dPad.right = true;
+      if(value == 1) dPad.right = true;
       else dPad.right = false;
       break;
     case 5:  //up
-      if (value == 1) dPad.up = true;
+      if(value == 1) dPad.up = true;
       else dPad.up = false;
       break;
     case 6:  //down
-      if (value == 1) dPad.down = true;
+      if(value == 1) dPad.down = true;
       else dPad.down = false;
       break;
     default:

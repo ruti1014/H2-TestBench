@@ -34,6 +34,9 @@ bool button_pressed[8] = {false, false, false, false, false, false, false, false
 uint32_t recordingFileIndex = 0;   // index for .csv-files
 const char recordingKeyName[] = "recStorageKey";      // max. 15 chars
 
+uint8_t restartCounter = 0;
+const char restartKeyName[] = "restStorageKey";
+
 uint16_t SensorBuffer[numData][sensorBufferSize];
 
 // TO-DO: maybe implement updateIntervall into SensorClass ?
