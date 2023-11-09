@@ -75,6 +75,7 @@ double BmeSensor::getValue(SensorType sensorType) {
 // HCell class implementation
 HCell::HCell(HardwareSerial* SerialH, String name)
   : Sensor(name, 4) {
+    
 }
 
 void HCell::update() {
