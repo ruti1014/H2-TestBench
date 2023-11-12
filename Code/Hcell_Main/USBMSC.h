@@ -70,7 +70,6 @@ static void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t eve
 // ######## SD Card SPI init ################################
 void initSDCard() {
   // new SPI Class Object:
-  static SPIClass* MicroSD_SPI = NULL;
   MicroSD_SPI = new SPIClass(HSPI);
   MicroSD_SPI->begin(SPI_SCK, SPI_MISO, SPI_MOSI, MicroSD_SPI_CS);
 
@@ -78,8 +77,8 @@ void initSDCard() {
   if (!SD.begin(MicroSD_SPI_CS, *MicroSD_SPI, 20000000)) {
     HWSerial.print(F("Storage initialization failed, "));
 
-    // restart automatically (up to 5 times, counter starts at 2 !!)
-    if (restartCounter > 6) {
+    // restart automatically (up to 5 times)
+    if (restartCounter > 5) {
       HWSerial.println("too many automatic restarts, connect storage and restart manually !");
 
       // TO-DO: proceed without storage init --> Flag sd_inited
@@ -89,11 +88,13 @@ void initSDCard() {
     } else {
       HWSerial.println("restarting...");
       restartCounter++;  // stored in preferences (permanant storage)
+      preferences.putInt(restartKeyName, restartCounter);
       ESP.restart();
     }
   } else {
     HWSerial.println(F("Storage initialization success"));
     restartCounter = 1;
+    preferences.putInt(restartKeyName, restartCounter);
     sd_inited = true;
   }
 

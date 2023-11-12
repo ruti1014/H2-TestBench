@@ -1,5 +1,5 @@
 /*  Description:     This file connects to an SD Card over SPI and uses this SD Card to create a Mass Storage Device which can be accessed via USB from a Computer.
-*   Author:          Jonas Geckle
+*   Author:          Jonas Geckle, Tim Ruf
 *   
 *   ESP32-S3 Settings:
 *       USB CDC On Boot: "Enabled"
@@ -59,6 +59,7 @@ USBCDC USBSerial;
 #define numSensors 5  // number of connected sensors
 #define numData 14    // number of data streams e.g. 1 bme280 = 3 data streams (temp, hum, pres)
 #define sensorBufferSize 100
+#define sampleRateMS 100  //sensor sample rate in ms
 //------------------------------------------------------------------------------------------------
 
 #include <SD.h>
@@ -91,6 +92,7 @@ void setup() {
   setupPreferences();
 
   initDisplay();
+
   initSDCard();
   initMS();
 
@@ -102,5 +104,10 @@ void setup() {
 void loop() {
   recording();
   multiplexerLoop();  // reads buttons every 100ms
+  //loopTimeMS();
+}
+
+
+void IRAM_ATTR onTimer() {
   addDataToBuffer();
 }

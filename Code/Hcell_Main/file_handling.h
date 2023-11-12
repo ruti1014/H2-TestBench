@@ -1,4 +1,4 @@
-#include "soc/uart_struct.h"
+//#include "soc/uart_struct.h"
 /*  ----------- file_handling.h -----------
 *   Author: Jonas Geckle
 *   Institution: Hochschule Karlsruhe
@@ -143,8 +143,9 @@ void createCSV(fs::FS &fs, uint32_t *fileIndex) {
   String headerCSV = "";
 
   for(int i=0; i<numData; i++){
-    tmpSensorName = sensorArray.getData(i)->sensorName;
-    tmpSensorUnit = sensorArray.getData(i)->unit;
+    // TO-DO: 
+    tmpSensorName = "TestSensor";      //sensorArray.getData(i)->sensorName;
+    tmpSensorUnit = "°C";              //sensorArray.getData(i)->unit;
     headerCSV += tmpSensorName + " (" + tmpSensorUnit + ");";
   }
   headerCSV += "\n";
@@ -156,6 +157,7 @@ void createCSV(fs::FS &fs, uint32_t *fileIndex) {
   // write file
   writeFile(fs, pathChar, headerChar);
   *fileIndex = *fileIndex + 1;
+  preferences.putUInt(recordingKeyName, recordingFileIndex);
 }
 
 // appends newest sensor data to .csv-file
@@ -184,7 +186,8 @@ void appendCSV(fs::FS &fs, uint32_t *fileIndex, int bufSize) {
   for (int j = 0; j < bufSize; j++) {
     // get next row
     for (int i = 0; i < numSensors; i++) {
-      data = SensorBuffer[i][j];
+      // TO-DO:
+      data = i;       //SensorBuffer[i][j];
       appendix += data + ";";
     }
     appendix += "\n";

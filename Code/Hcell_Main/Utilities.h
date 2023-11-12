@@ -15,26 +15,32 @@ void setup_pins() {
   initMultiplexer();
 }
 
-void setupPreferences(){
+void setupPreferences() {
   // permanent storage of recordingFileIndex
   preferences.begin("permaStorage", false);  // false --> read/write       true --> read-only
 
 
   recordingFileIndex = preferences.getUInt(recordingKeyName, 0);  // get previous FileIndex (returns 0 if key doesn't exist)
-  restartCounter = preferences.getUInt(restartKeyName, 0);
+  restartCounter = preferences.getInt(restartKeyName, -1);
 
-  if(recordingFileIndex == 0) {
+  if (recordingFileIndex == 0) {
     recordingFileIndex = 1;
     preferences.putUInt(recordingKeyName, recordingFileIndex);
   } else if (recordingFileIndex == 4294967295) {
     resetFileIndex();
   }
 
-  if(restartCounter == 0){
-    restartCounter = 1;
-    preferences.putUInt(restartKeyName, restartCounter);
+  if (restartCounter == -1) {
+    restartCounter = 0;
+    preferences.putInt(restartKeyName, restartCounter);
   }
+}
 
+void setupTimer() {
+  isr_timer = timerBegin(0, 80, true); //Prescaler 80 with cpu clock at 80 MHZ -> 1ms timer count
+  timerAttachInterrupt(isr_timer, &onTimer, true);
+  timerAlarmWrite(isr_timer, sampleRateMS, true);
+  timerAlarmEnable(isr_timer);
 }
 
 void resetFileIndex() {
@@ -50,9 +56,9 @@ void resetRestartCounter() {
   preferences.putUInt(restartKeyName, restartCounter);
 }
 
-bool startHcell() {
+void startHcell() {
   //TO-DO implement leaksensor limits
-  if(!hCellState) {
+  if (!hCellState) {
     HWSerial.println("Starting Hcell! ");
     digitalWrite(PIN_cutoff, HIGH);      // open cut-off
     digitalWrite(PIN_startHcell, HIGH);  // start H-Cell
@@ -60,8 +66,8 @@ bool startHcell() {
   }
 }
 
-bool stopHcell() {
-  if(hCellState) {
+void stopHcell() {
+  if (hCellState) {
     HWSerial.println("Stopping Hcell! ");
     digitalWrite(PIN_cutoff, LOW);      // close cut-off
     digitalWrite(PIN_startHcell, LOW);  // turn off H-Cell
@@ -72,18 +78,21 @@ bool stopHcell() {
 void recording() {
   static bool lastState = recordingFlag;
 
-  if(recordingFlag) {
-    if(lastState != recordingFlag) {
+  if (recordingFlag) {    // recording pressed
+    if (lastState != recordingFlag) {     // recording pressed for the first time
       connectMS(false);  //disconnect MS to prevent data corruption
       createCSV(SD, &recordingFileIndex);
     }
     // append new data if available
-    if(appendBufferFlag){
+    if (appendBufferFlag) {
+      HWSerial.println("appendBufferFlag == true");
       appendCSV(SD, &recordingFileIndex, sensorBufferSize);
       appendBufferFlag = false;
     }
-  } else {
-    if(lastState != recordingFlag) {
+  } else {      // recording not pressed
+    if (lastState != recordingFlag) {       // recording switched off
+      appendCSV(SD, &recordingFileIndex, bufferIndex);
+      bufferIndex = 0;
       connectMS(true);  //connect MS to transfer recorded data
     }
   }
@@ -94,58 +103,115 @@ void buttonInterpreter(int button, int value) {
   //value == 0 button release
   //value == 1 button pressed
   switch (button) {
-    case 0:  //hcell start == 1, stop == 0
-      if(value == 1) startHcell();
-      else stopHcell();
-      break;
-    case 1:  //recording start == 1, stop == 0
-      if(value == 1) recordingFlag = true;
-      else recordingFlag = false;
-      break;
-    case 2:  //OK
-      if(value == 1) dPad.ok = true;
-      else dPad.ok = false;
-      break;
-    case 3:  //left
-      if(value == 1) dPad.left = true;
+    case 0:  //left
+      if (value == 1) dPad.left = true;
       else dPad.left = false;
       break;
-    case 4:  //right
-      if(value == 1) dPad.right = true;
+    case 1:  //OK
+      if (value == 1) dPad.ok = true;
+      else dPad.ok = false;
+      break;
+    case 2:  //right
+      if (value == 1) dPad.right = true;
       else dPad.right = false;
       break;
-    case 5:  //up
-      if(value == 1) dPad.up = true;
+    case 3:  //up
+      if (value == 1) dPad.up = true;
       else dPad.up = false;
       break;
-    case 6:  //down
-      if(value == 1) dPad.down = true;
+    case 4:  //down
+      if (value == 1) dPad.down = true;
       else dPad.down = false;
+      break;
+    case 5:  //HCell start == 1, stop == 0
+      if (value == 1){
+        HWSerial.print("Start: ");
+        HWSerial.println(value);
+        startHcell();
+      }
+      else{
+        HWSerial.print("Start: ");
+        HWSerial.println(value);
+        stopHcell();
+      }
+      break;
+    case 6:  //recording start == 1, stop == 0
+      if (value == 1){
+        HWSerial.print("Recording: ");
+        HWSerial.println(value);
+        recordingFlag = true;
+      }
+      else{
+        HWSerial.print("Recording: ");
+        HWSerial.println(value);
+        recordingFlag = false;
+      }
       break;
     default:
       break;
   }
 }
 
-void addDataToBuffer(){
-  static int bufferIndex = 0;
-  static uint16_t tmpSensorData = 0;
-  static int time = millis();
+// void buttonInterpreter(int button, int value) {
+//   switch (button) {
+//     case 0:
+//       HWSerial.println("CH0");
+//       break;
+//     case 1:
+//       HWSerial.println("CH1");
+//       break;
+//     case 2:
+//       HWSerial.println("CH2");
+//       break;
+//     case 3:
+//       HWSerial.println("CH3");
+//       break;
+//     case 4:
+//       HWSerial.println("CH4");
+//       break;
+//     case 5:
+//       HWSerial.println("CH5");
+//       break;
+//     case 6:
+//       HWSerial.println("CH6");
+//       break;
+//     default:
+//       break;
+//   }
+// }
 
-  if(!appendBufferFlag){      // to prevent buffer override
-    if(millis() >= (time + updateIntervall))
-    {
+void addDataToBuffer() {
+  static uint16_t tmpSensorData = 0;
+
+  if (!appendBufferFlag) {  // to prevent buffer override
       // read current sensor data and write to buffer
-      for(int i=0; i<numData; i++){
+      for (int i = 0; i < numData; i++) {
         tmpSensorData = sensorArray.getData(i)->value;
         SensorBuffer[i][bufferIndex] = tmpSensorData;
       }
       bufferIndex++;
-      if(bufferIndex == sensorBufferSize){
-        bufferIndex = 0;      // wrap around
+      if (bufferIndex == sensorBufferSize) {
+        bufferIndex = 0;  // wrap around
         appendBufferFlag = true;
       }
-      time = millis();
-    }
+  }
+}
+
+void loopTimeMS() {
+  static int frameTime = 0;
+  static int timeStamp = millis();
+  static int avgCount = 0;
+  int avgNum = 100;
+
+  if (avgCount >= avgNum) {
+    frameTime = frameTime / avgNum;
+    HWSerial.print("Average frametime: ");
+    HWSerial.println(frameTime);
+    frameTime = 0;
+    avgCount = 0;
+  } else {
+    frameTime += millis() - timeStamp;
+    timeStamp = millis();
+    avgCount++;
   }
 }

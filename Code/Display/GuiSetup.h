@@ -54,3 +54,23 @@ void setupGui() {
   gui.loadPage(&mainPage);
   statusBar.loadPage(&statusPage);
 }
+
+
+void loopTimeMS(){
+  static int frameTime = 0;
+  static int timeStamp = millis();
+  static int avgCount = 0;
+  int avgNum = 100;
+
+  if (avgCount >= avgNum){
+    frameTime = frameTime/avgNum;
+    Serial.print("Average frametime: "); Serial.println(frameTime);
+    frameTime = 0;
+    avgCount = 0;
+  }else{
+    frameTime += millis() - timeStamp;
+    timeStamp = millis();
+    avgCount++;
+  }
+
+}

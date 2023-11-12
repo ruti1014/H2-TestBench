@@ -1,13 +1,17 @@
+#include "esp32-hal-timer.h"
 //function prototypes
 //Utilities
 void setup_pins();
 void setupPreferences();
+void setupTimer();
 void resetFileIndex();
-bool startHcell();
-bool stopHcell();
+void startHcell();
+void stopHcell();
 void recording();
 void buttonInterpreter(int, int);
 void addDataToBuffer();
+void loopTimeMS();
+void IRAM_ATTR onTimer();
 
 // enum SensorType;
 // struct SensorData;
@@ -34,10 +38,11 @@ bool button_pressed[8] = {false, false, false, false, false, false, false, false
 uint32_t recordingFileIndex = 0;   // index for .csv-files
 const char recordingKeyName[] = "recStorageKey";      // max. 15 chars
 
-uint8_t restartCounter = 0;
+int8_t restartCounter = 0;
 const char restartKeyName[] = "restStorageKey";
 
 uint16_t SensorBuffer[numData][sensorBufferSize];
+int bufferIndex = 0;
 
 // TO-DO: maybe implement updateIntervall into SensorClass ?
 int updateIntervall = 100;    // sensor update intervall in ms
@@ -55,6 +60,10 @@ struct directionalPad{
 Preferences preferences;
 HardwareSerial SerialHCELL(2);  //Using Serial2
 struct directionalPad dPad;
+hw_timer_t *isr_timer = NULL;
+SPIClass* Display_SPI = NULL;
+SPIClass* MicroSD_SPI = NULL;
+TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, SPI_MISO, Display_SPI_CS, Display_LED);
 
 //create sensor objects
 AnalogSensor h2flow(PIN_flowsensor, "h2flow", SENS_H2FLOW);

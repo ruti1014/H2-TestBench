@@ -38,18 +38,18 @@ void Gui::moveCursor(Direction d) {
   _currentPage->getSelectedElement()->hoverElement();
 }
 
-  int Gui::getX(){
-    return _posX;
-  }
-  int Gui::getY(){
-    return _posY;
-  }
-  int Gui::getWidth(){
-    return _width;
-  }
-  int Gui::getHeight(){
-    return _height;
-  }
+int Gui::getX() {
+  return _posX;
+}
+int Gui::getY() {
+  return _posY;
+}
+int Gui::getWidth() {
+  return _width;
+}
+int Gui::getHeight() {
+  return _height;
+}
 
 
 
@@ -69,7 +69,7 @@ GuiPage::GuiPage(Gui* gui, int row, int column)
 }
 
 void GuiPage::drawPage() {
-  fillPage(_BGcolor);
+  //fillPage(_BGcolor);
   for (int r = 0; r < _rows; r++) {
     for (int c = 0; c < _columns; c++) {
       if (_elementMatrix[r][c] != NULL) _elementMatrix[r][c]->drawElement();
@@ -78,8 +78,8 @@ void GuiPage::drawPage() {
   }
 }
 
-void GuiPage::fillPage(uint16_t color){
-  _gui->getGraphicsAdapter()->drawFillRect(_gui->getX(), _gui->getY(),_gui->getX() + _gui->getWidth(), _gui->getY()+_gui->getHeight(), color);
+void GuiPage::fillPage(uint16_t color) {
+  _gui->getGraphicsAdapter()->drawFillRect(_gui->getX(), _gui->getY(), _gui->getX() + _gui->getWidth(), _gui->getY() + _gui->getHeight(), color);
 }
 
 void GuiPage::addElement(Element* element, int row, int column) {
@@ -101,6 +101,7 @@ void GuiPage::setCursor(int row, int column) {
 
 void GuiPage::moveCursor(Direction d) {
 
+
   switch (d) {
     case LEFT:
       _cursorC--;
@@ -118,17 +119,17 @@ void GuiPage::moveCursor(Direction d) {
       _cursorR--;
       if (_cursorR < 0) _cursorR = _rows;
       break;
-  }
+  }  //TO-DO null timeout prevention
 }
 
-void GuiPage::setBGColor(uint16_t color){
+void GuiPage::setBGColor(uint16_t color) {
   _BGcolor = color;
 }
 
 
 //########### Elements ###########
 Element::Element(int posX, int posY, int width, int length, int color)
-  : _posX(posX), _posY(posY), _width(width), _length(length), _color(color) {  }
+  : _posX(posX), _posY(posY), _width(width), _length(length), _color(color) {}
 
 void Element::onClick() {}
 
