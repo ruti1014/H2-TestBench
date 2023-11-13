@@ -4,6 +4,8 @@
 void setup_pins();
 void setupPreferences();
 void setupTimer();
+void setupSPI();
+void setupDisplay();
 void resetFileIndex();
 void startHcell();
 void stopHcell();
@@ -63,7 +65,7 @@ struct directionalPad dPad;
 hw_timer_t *isr_timer = NULL;
 SPIClass* Display_SPI = NULL;
 SPIClass* MicroSD_SPI = NULL;
-TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, SPI_MISO, Display_SPI_CS, Display_LED);
+TFT_22_ILI9225 tft_ili = TFT_22_ILI9225(TFT_RST, SPI_MISO, Display_SPI_CS, Display_LED);
 
 //create sensor objects
 AnalogSensor h2flow(PIN_flowsensor, "h2flow", SENS_H2FLOW);

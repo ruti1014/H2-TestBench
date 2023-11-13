@@ -74,11 +74,12 @@ USBCDC USBSerial;
 #include "CustomSensor.h"
 
 #include "Globals.h"
+#include "GuiSetup.h"
 #include "file_handling.h"
 #include "LogoHEK.h"
 #include "USBMSC.h"
 #include "Multiplexer.h"
-#include "Display_init.h"
+
 
 #include "Utilities.h"
 
@@ -86,19 +87,20 @@ USBCDC USBSerial;
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void setup() {
-  HWSerial.begin(9600);
+  HWSerial.begin(115200);
   HWSerial.setDebugOutput(true);
   setup_pins();
   setupPreferences();
-
-  initDisplay();
+  setupSPI();
 
   initSDCard();
-  initMS();
+  if (sd_inited) initMS();
 
   USB.onEvent(usbEventCallback);
   USBSerial.begin();
   USB.begin();
+  setupDisplay();
+  setupGui();
 }
 
 void loop() {

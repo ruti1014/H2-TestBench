@@ -69,20 +69,20 @@ static void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t eve
 
 // ######## SD Card SPI init ################################
 void initSDCard() {
-  // new SPI Class Object:
-  MicroSD_SPI = new SPIClass(HSPI);
-  MicroSD_SPI->begin(SPI_SCK, SPI_MISO, SPI_MOSI, MicroSD_SPI_CS);
 
   // init SD Class with SPI Class Object:
   if (!SD.begin(MicroSD_SPI_CS, *MicroSD_SPI, 20000000)) {
     HWSerial.print(F("Storage initialization failed, "));
 
+    HWSerial.print(restartCounter); 
     // restart automatically (up to 5 times)
     if (restartCounter > 5) {
       HWSerial.println("too many automatic restarts, connect storage and restart manually !");
 
       // TO-DO: proceed without storage init --> Flag sd_inited
       sd_inited = false;
+      restartCounter = 0;
+      preferences.putInt(restartKeyName, restartCounter);
       return;
 
     } else {
@@ -93,7 +93,7 @@ void initSDCard() {
     }
   } else {
     HWSerial.println(F("Storage initialization success"));
-    restartCounter = 1;
+    restartCounter = 0;
     preferences.putInt(restartKeyName, restartCounter);
     sd_inited = true;
   }
@@ -141,7 +141,11 @@ void initMS() {
   MS.onWrite(onWrite);
   MS.onStartStop(onStartStop);
   MS.mediaPresent(true);
-  MS.begin(SD.numSectors(), SD.cardSize() / SD.numSectors());
+  if (SD.numSectors() != 0) MS.begin(SD.numSectors(), SD.cardSize() / SD.numSectors());
+  else sd_inited = false;
+
+  HWSerial.print("SD init status: ");
+  HWSerial.println(sd_inited);
 }
 
 // ######## Mass Storage connect ################################

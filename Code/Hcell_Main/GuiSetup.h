@@ -1,31 +1,4 @@
 #include "Gui.h"
-// define SPI Pins:
-
-SPIClass hspi(HSPI);
-//ESP32
-// #define TFT_RST 26  // IO 26
-// #define TFT_RS 25   // IO 25
-// #define TFT_CLK 14  // HSPI-SCK
-// #define TFT_SDI 13  // HSPI-MOSI
-// #define TFT_CS 15   // HSPI-SS0
-// #define TFT_LED 3   // 0 if wired to +5V directly'
-
-//TFT_22_ILI9225 tft_ili = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, 200);
-
-//ESP32 S3
-#define SPI_MOSI 41  // Display_SDI
-#define SPI_MISO 42  // Display_RS
-#define SPI_SCK 40
-
-#define Display_SPI_CS 21
-#define TFT_RST 48
-#define Display_LED 0 
-
-
-TFT_22_ILI9225 tft_ili = TFT_22_ILI9225(TFT_RST, SPI_MISO, Display_SPI_CS, Display_LED);
-
-
-
 
 
 TFTGraphics tft(&tft_ili);
@@ -53,6 +26,7 @@ Button b2(80, 5, 60, 20, COLOR_ORANGE);
 Button b3(150, 5, 60, 20, COLOR_ORANGE);
 
 void setupGui() {
+
   mainPage.setBGColor(COLOR_LIGHTGREY);
   mainPage.addElement(&a1, 0, 0);
   mainPage.addElement(&a2, 0, 1);
@@ -73,22 +47,3 @@ void setupGui() {
   statusBar.loadPage(&statusPage);
 }
 
-
-void loopTimeMS(){
-  static int frameTime = 0;
-  static int timeStamp = millis();
-  static int avgCount = 0;
-  int avgNum = 100;
-
-  if (avgCount >= avgNum){
-    frameTime = frameTime/avgNum;
-    Serial.print("Average frametime: "); Serial.println(frameTime);
-    frameTime = 0;
-    avgCount = 0;
-  }else{
-    frameTime += millis() - timeStamp;
-    timeStamp = millis();
-    avgCount++;
-  }
-
-}
