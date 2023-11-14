@@ -56,10 +56,11 @@ USBCDC USBSerial;
 #define channelC 47
 
 //------------------------------------------------------------------------------------------------
-#define numSensors 5  // number of connected sensors
-#define numData 14    // number of data streams e.g. 1 bme280 = 3 data streams (temp, hum, pres)
+#define numSensors 4  // number of connected sensors
+#define numData 8    // number of data streams e.g. 1 bme280 = 3 data streams (temp, hum, pres)
 #define sensorBufferSize 100
 #define sampleRateMS 100  //sensor sample rate in ms
+#define storageInitFailed 5 //how many time the esp trys to connect to sd card
 //------------------------------------------------------------------------------------------------
 
 #include <SD.h>
@@ -89,12 +90,15 @@ USBCDC USBSerial;
 void setup() {
   HWSerial.begin(115200);
   HWSerial.setDebugOutput(true);
+
+  SerialHCELL.begin(115200, SERIAL_8N1, 16, 17);  //Baudrate, Protocol, RX, TX
+
   setup_pins();
   setupPreferences();
   setupSPI();
-
   initSDCard();
   if (sd_inited) initMS();
+  setupSensors();
 
   USB.onEvent(usbEventCallback);
   USBSerial.begin();
@@ -103,9 +107,12 @@ void setup() {
   setupGui();
 }
 
+
+//To-DO updateSensorValues time consumption
 void loop() {
-  recording();
+  if (sd_inited) recording();
   multiplexerLoop();  // reads buttons every 100ms
+  sensorArray.updateSensorValues();
   //loopTimeMS();
 }
 

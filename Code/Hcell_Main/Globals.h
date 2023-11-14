@@ -6,6 +6,7 @@ void setupPreferences();
 void setupTimer();
 void setupSPI();
 void setupDisplay();
+void setupSensors();
 void resetFileIndex();
 void startHcell();
 void stopHcell();
@@ -68,10 +69,10 @@ SPIClass* MicroSD_SPI = NULL;
 TFT_22_ILI9225 tft_ili = TFT_22_ILI9225(TFT_RST, SPI_MISO, Display_SPI_CS, Display_LED);
 
 //create sensor objects
-AnalogSensor h2flow(PIN_flowsensor, "h2flow", SENS_H2FLOW);
-AnalogSensor h2leak(PIN_leaksensor, "h2leak", SENS_H2LEAK);
+AnalogSensor h2flow(PIN_flowsensor, "h2flow", SENS_H2FLOW, 1, "ml/s");
+AnalogSensor h2leak(PIN_leaksensor, "h2leak", SENS_H2LEAK, 1, "ppm");
 BmeSensor bme1(0x76, "bme1");
 BmeSensor bme2(0x77, "bme2");
 
 //create sensor array
-SensorArray sensorArray(4, 6);  //Amount of sensors, amount of captuered data
+SensorArray sensorArray(numSensors, numData);  //Amount of sensors, amount of captuered data

@@ -26,9 +26,9 @@
 // ######### generic analog sensor #########
 class AnalogSensor : public Sensor {
 public:
-  AnalogSensor(int pin, String name, SensorType sensorType);
+  AnalogSensor(int pin, String name, SensorType sensorType, int interval, String unit);
   void update() override;
-  double getValue();
+  uint16_t getValue();
 
 private:
   int _pin;
@@ -39,11 +39,20 @@ class BmeSensor : public Sensor {
 public:
   BmeSensor(int address, String name);
   void update() override;
-  double getValue(SensorType sensorType);
+  uint16_t getValue(SensorType sensorType);
 private:
-  Adafruit_BME280 _bme;
+  Adafruit_BME280 _bme = NULL;
+  bool bme_available = false;
 };
 
+// ######### HcellRS232 #########
+class Hcell_RS232 : public Sensor {
+public:
+  Hcell_RS232(HardwareSerial* serial, String name);
+  void update() override;
+private:
+  HardwareSerial* _hcellSerial = NULL;
+};
 
 
 

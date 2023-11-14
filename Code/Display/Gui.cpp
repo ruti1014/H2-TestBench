@@ -98,8 +98,6 @@ void GuiPage::setCursor(int row, int column) {
 }
 
 void GuiPage::moveCursor(Direction d) {
-
-  Serial0.println("cursorR: ");
   int numChecks;
   int checkCounter = 0;
   int directionX = 0;
@@ -127,32 +125,18 @@ void GuiPage::moveCursor(Direction d) {
       break;
   }
 
-  if (tempElementCursor == NULL) {
-    Serial0.println("NULL");
-  } else {
-    Serial0.println("NOT");
-  }
-
-  Serial0.println("2");
   while ((checkCounter < numChecks) && (tempElementCursor == NULL)) {
-    Serial0.print("CheckCounter: ");
-    Serial0.println(checkCounter);
     tempC += directionX;
     tempR += directionY;
     if (tempC >= _columns) tempC = 0;
-    if (tempC < 0) tempC = _columns;
+    if (tempC < 0) tempC = _columns -1;
     if (tempR >= _rows) tempR = 0;
-    if (tempR < 0) tempR = _rows;
+    if (tempR < 0) tempR = _rows -1;
 
-    Serial0.print("tempx: ");
-    Serial0.println(tempC);
-    Serial0.print("tempy: ");
-    Serial0.println(tempR);
 
     checkCounter++;
     tempElementCursor = _elementMatrix[tempR][tempC];
   }
-  Serial0.println("3");
   _cursorC = tempC;
   _cursorR = tempR;
 

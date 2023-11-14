@@ -48,7 +48,6 @@ bool SensorArray::addSensor(Sensor* sensor) {
   int sensorDataAmount = sensor->getDataQuantity();
   if ((_dataIndex < _dataAmount) && sensorAddSucces) {
     for (int i = 0; i < sensorDataAmount; i++) {
-      //Todo: populate _dataList with SensorData structs from sensor
       SensorData* data = NULL;
       data = sensor->getSensorData(i);
       _dataList[_dataIndex + i] = *data;
@@ -60,6 +59,9 @@ bool SensorArray::addSensor(Sensor* sensor) {
 }
 
 void SensorArray::updateSensorValues() {
+  //TO-DO interval handling
+  //static unsigned int interval = 0;
+
   for (int i = 0; i < _sensorIndex; i++) {
     _sensorList[i]->update();
   }
@@ -76,6 +78,6 @@ String SensorArray::getSensorList() {
 
 SensorData* SensorArray::getData(int i) {
   SensorData* temp = NULL;
-  if (i >= 0 && i < _dataIndex) *temp = _dataList[i];
+  if (i >= 0 && i < _dataIndex) temp = &_dataList[i];
   return temp;
 }

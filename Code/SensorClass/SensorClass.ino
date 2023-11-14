@@ -5,21 +5,29 @@
 #include "CustomSensor.h"
 
 
+#define numSens 4
+#define numData 6
+
+HardwareSerial SerialH(2);
+
+
 //create sensor objects
-AnalogSensor h2flow(19, "h2flow", SENS_H2FLOW);
-AnalogSensor h2leak(19, "h2leak", SENS_H2LEAK);
-AnalogSensor rndhum(19, "rndhum", SENS_HUM);
+AnalogSensor h2flow(19, "h2flow", SENS_H2FLOW, 1, "ml/s");
+AnalogSensor h2leak(19, "h2leak", SENS_H2LEAK, 1, "ppm");
+AnalogSensor rndhum(19, "rndhum", SENS_HUM, 1, "rnd");
 BmeSensor bme1(0x76, "bme1");
 
 //create sensor array
-SensorArray sensorArray(4, 6);  //Amount of sensors, amount of captuered data
+SensorArray sensorArray(numSens, numData);  //Amount of sensors, amount of captuered data
 
 void setup() {
-  Serial.begin(115200);
-  Serial.println("Start");
+  SerialH.begin(115200, SERIAL_8N1, 16, 17);
 
-  Serial.println(sizeof(uint8_t));
-  Serial.println(sizeof(SensorData));
+  Serial0.begin(115200);
+  Serial0.println("Start");
+
+  Serial0.println(sizeof(uint8_t));
+  Serial0.println(sizeof(SensorData));
 
   sensorArray.addSensor(&h2flow);
   sensorArray.addSensor(&h2leak);
@@ -27,15 +35,19 @@ void setup() {
 
 
   sensorArray.addSensor(&bme1);
-  Serial.println("Active sensors: ");
+  Serial0.println("Active sensors: ");
 
   String tmp = sensorArray.getSensorList();
-  Serial.println(tmp);
+  Serial0.println(tmp);
 
-  // double tmpData;
-  // for(int i=0; i<sensorArray.getDataQuantity(); i++){
-  //   tmpData = sensorArray.getData(i).value;
-  // }
+
+
+  for (int i = 0; i < numData; i++) {
+    Serial0.println(sensorArray.getData(i)->sensorName);
+  }
+  sensorArray.updateSensorValues();
+
+  Serial0.println("Setup end");
 }
 
 void loop() {}

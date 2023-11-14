@@ -61,6 +61,13 @@ void setupDisplay() {
   tft_ili.clear();
 }
 
+void setupSensors() {
+  sensorArray.addSensor(&h2flow);
+  sensorArray.addSensor(&h2leak);
+  sensorArray.addSensor(&bme1);
+  sensorArray.addSensor(&bme2);
+}
+
 void resetFileIndex() {
   HWSerial.println("Resetting fileIndex...");
   recordingFileIndex = 1;

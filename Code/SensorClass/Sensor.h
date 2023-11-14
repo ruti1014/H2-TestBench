@@ -16,7 +16,11 @@ enum SensorType {
   SENS_HUM,
   SENS_PRESSURE,
   SENS_H2FLOW,
-  SENS_H2LEAK
+  SENS_H2LEAK,
+  SENS_CURRENT,
+  SENS_VOLTAGE,
+  SENS_SERIALID,
+  SENS_ERRCODE
 };
 
 //Sensor data Struct
@@ -25,7 +29,7 @@ struct SensorData {
   String unit;
   SensorType type;
   uint16_t value;
-  int inverval; //interval in which the sensor is read
+  int interval; //interval in which the sensor is read
 };
 
 

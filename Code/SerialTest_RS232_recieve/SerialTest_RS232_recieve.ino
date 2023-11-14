@@ -1,7 +1,7 @@
 //Dummy program to simulate rs232 answers from the H-Cell
 
 
-HardwareSerial SerialH(2);  //Using Serial0
+HardwareSerial SerialH(2); 
 
 
 void setup() {
