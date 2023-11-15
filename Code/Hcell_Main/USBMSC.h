@@ -23,7 +23,7 @@ int timestamp_refreshMS = 0;  // to measure a delay of 500 ms   --    '0' indica
 // ######## USB callback functions ################################
 // triggered when PC writes to MSC
 static int32_t onWrite(uint32_t lba, uint32_t offset, uint8_t* buffer, uint32_t bufsize) {
-  // HWSerial.printf("MSC WRITE: lba: %u, offset: %u, bufsize: %u\n", lba, offset, bufsize);
+  HWSerial.printf("MSC WRITE: lba: %u, offset: %u, bufsize: %u\n", lba, offset, bufsize);
   return SD.writeRAW((uint8_t*)buffer, lba) ? bufsize : -1;
 }
 
@@ -35,7 +35,7 @@ static int32_t onRead(uint32_t lba, uint32_t offset, void* buffer, uint32_t bufs
 
 // triggered when PC ejects MSC
 static bool onStartStop(uint8_t power_condition, bool start, bool load_eject) {
-  HWSerial.printf("MSC START/STOP: power: %u, start: %u, eject: %u\n", power_condition, start, load_eject);
+  // HWSerial.printf("MSC START/STOP: power: %u, start: %u, eject: %u\n", power_condition, start, load_eject);
   return true;
 }
 
@@ -71,31 +71,33 @@ static void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t eve
 void initSDCard() {
 
   // init SD Class with SPI Class Object:
-  if (!SD.begin(MicroSD_SPI_CS, *MicroSD_SPI, 20000000)) {
+  if (!SD.begin(MicroSD_SPI_CS, *MicroSD_SPI)) {
     HWSerial.print(F("Storage initialization failed ("));
 
-    HWSerial.print(restartCounter); 
-    HWSerial.print("), ");
-    // restart automatically (up to 5 times)
-    if (restartCounter > storageInitFailed) {
-      HWSerial.println("too many automatic restarts, connect storage and restart manually !");
+    while(1);
 
-      // TO-DO: proceed without storage init --> Flag sd_inited
-      sd_inited = false;
-      restartCounter = 0;
-      preferences.putInt(restartKeyName, restartCounter);
-      return;
+    // HWSerial.print(restartCounter); 
+    // HWSerial.print("), ");
+    // // restart automatically (up to 5 times)
+    // if (restartCounter > storageInitFailed) {
+    //   HWSerial.println("too many automatic restarts, connect storage and restart manually !");
 
-    } else {
-      HWSerial.println("restarting...");
-      restartCounter++;  // stored in preferences (permanant storage)
-      preferences.putInt(restartKeyName, restartCounter);
-      ESP.restart();
-    }
+    //   // TO-DO: proceed without storage init --> Flag sd_inited
+    //   sd_inited = false;
+    //   restartCounter = 0;
+    //   preferences.putInt(restartKeyName, restartCounter);
+    //   return;
+
+    // } else {
+    //   HWSerial.println("restarting...");
+    //   restartCounter++;  // stored in preferences (permanant storage)
+    //   preferences.putInt(restartKeyName, restartCounter);
+    //   ESP.restart();
+    // }
   } else {
     HWSerial.println(F("Storage initialization success"));
-    restartCounter = 0;
-    preferences.putInt(restartKeyName, restartCounter);
+    // restartCounter = 0;
+    // preferences.putInt(restartKeyName, restartCounter);
     sd_inited = true;
   }
 

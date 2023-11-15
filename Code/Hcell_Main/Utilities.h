@@ -44,13 +44,13 @@ void setupTimer() {
 }
 
 void setupSPI() {
-  //Display SPI Class:
-  Display_SPI = new SPIClass(HSPI);
-  Display_SPI->begin(SPI_SCK, SPI_MISO, SPI_MOSI, Display_SPI_CS);
-
   //MicroSD SPI Class:
   MicroSD_SPI = new SPIClass(HSPI);
   MicroSD_SPI->begin(SPI_SCK, SPI_MISO, SPI_MOSI, MicroSD_SPI_CS);
+
+  //Display SPI Class:
+  Display_SPI = new SPIClass(HSPI);
+  Display_SPI->begin(SPI_SCK, SPI_MISO, SPI_MOSI, Display_SPI_CS);
 }
 
 void setupDisplay() {

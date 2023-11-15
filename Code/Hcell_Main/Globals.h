@@ -66,6 +66,8 @@ struct directionalPad dPad;
 hw_timer_t *isr_timer = NULL;
 SPIClass* Display_SPI = NULL;
 SPIClass* MicroSD_SPI = NULL;
+SPIClass* spi = NULL;
+
 TFT_22_ILI9225 tft_ili = TFT_22_ILI9225(TFT_RST, SPI_MISO, Display_SPI_CS, Display_LED);
 
 //create sensor objects

@@ -91,20 +91,29 @@ void setup() {
   HWSerial.begin(115200);
   HWSerial.setDebugOutput(true);
 
+  USB.onEvent(usbEventCallback);
+
+  setupSPI();
+  initSDCard();
+  if (sd_inited) initMS();
+
+  USBSerial.begin();
+  USB.begin();
+
   SerialHCELL.begin(115200, SERIAL_8N1, 16, 17);  //Baudrate, Protocol, RX, TX
 
   setup_pins();
   setupPreferences();
-  setupSPI();
-  initSDCard();
-  if (sd_inited) initMS();
+  
   setupSensors();
+  
+  // setupDisplay();
+  // setupGui();
 
-  USB.onEvent(usbEventCallback);
-  USBSerial.begin();
-  USB.begin();
-  setupDisplay();
-  setupGui();
+  writeFile(SD, "/Test2.txt", "Test\n1234");
+  MS.mediaPresent(false);
+  delay(1000);
+  MS.mediaPresent(true);
 }
 
 

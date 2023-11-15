@@ -78,11 +78,11 @@ int timestamp_refreshMS = 0;    // to measure a delay of 500 ms   --    '0' indi
     // init SD Class with SPI Class Object:
     if ( !SD.begin( MicroSD_SPI_CS, *spi, 20000000 ) ){
       HWSerial.print(F("Storage initialization failed, "));
-      HWSerial.println("restarting...");
-      ESP.restart();
+      // HWSerial.println("restarting...");
+      // ESP.restart();
 
-      // HWSerial.println("Stopped");
-      // while(1);
+      HWSerial.println("Stopped");
+      while(1);
     }
     else{       
       HWSerial.println(F("Storage initialization success"));
