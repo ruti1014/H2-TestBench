@@ -8,7 +8,7 @@
 class Element;
 class GuiPage;
 
-enum Direction{
+enum Direction {
   LEFT,
   RIGHT,
   UP,
@@ -24,6 +24,8 @@ public:
   void loadPage(GuiPage* page);
   void loadLastPage();
   GraphicsAdapter* getGraphicsAdapter();
+  void clickCursor();
+  void selectCursor();
   void moveCursor(Direction d);
   int getX();
   int getY();
@@ -34,7 +36,6 @@ private:
 
   int _pageNum, _pageCount;
   GraphicsAdapter* _ga;
-  GuiPage* _staticPage;
   GuiPage* _currentPage;
   GuiPage** _pageList;
   int _posX, _posY, _width, _height;
@@ -51,8 +52,9 @@ public:
   void setCursor(int row, int column);
   void moveCursor(Direction d);
   void setBGColor(uint16_t color);
+  int getBGColor();
 private:
-  uint16_t _BGcolor = 0x00;
+  uint16_t _BGcolor = 0xFF;
   int _rows, _columns;
   int _columnIndex = 0;
   Gui* _gui;
@@ -68,34 +70,67 @@ private:
 
 class Element {
 public:
-  Element(int posX, int posY, int width, int length, int color);
+  Element(int posX, int posY, int width, int height, int color);
   virtual void drawElement() = 0;
   virtual void hoverElement() = 0;
   virtual void selectElement() = 0;
-  virtual void resetElement() = 0;
-  void onClick();
+  void setSelectable(bool selectable);
+  bool isSelectable();
+  void click();
+  void onClick(void (*clickCallback)(void));
   void setGui(Gui* gui);
+
+  //element Customization
+  void setBGColor(int color);
+  void setHoverColor(int color);
+  void setSelectColor(int color);
+  void setSelectTextColor(int color);
+
 protected:
   Gui* _gui;
   int _posX;
   int _posY;
-  int _length;
   int _width;
+  int _height;
   uint16_t _color;
-  bool _selectable;
+  uint16_t _bgColor;
+  uint16_t _hoverColor;
+  uint16_t _selectColor;
+  uint16_t _selectTextColor;
+  bool _selectable = true;
+  void (*_clickCallback)(void) = NULL;  //Callback function for click event
 };
 
+
+//Custom Elements
 class Button : public Element {
 public:
-  Button(int posX, int posY, int width, int length, int color);
+  Button(int posX, int posY, int width, int height, String text, int color);
   void drawElement() override;
   void hoverElement() override;
   void selectElement() override;
-  void resetElement() override;
-  void onClick();
+  //Element customization
+  void setText(String text);
+  void setTextColor(int color);
+private:
+  void drawButton(int textColor, int bgColor, int lineColor);
+  String _text;
+  uint16_t _textColor;
 };
 
+class TextBox : public Element {
+public:
+  TextBox(int posX, int posY, int width, int height, String text, int color);
+  void drawElement() override;
+  void hoverElement() override;
+  void selectElement() override;
 
+  void setText(String text);
+  void setTextColor(int color);
+private:
+  String _text;
+  uint16_t _textColor;
+};
 
 
 #endif

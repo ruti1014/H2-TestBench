@@ -81,7 +81,6 @@ USBCDC USBSerial;
 #include "USBMSC.h"
 #include "Multiplexer.h"
 
-
 #include "Utilities.h"
 
 
@@ -104,25 +103,23 @@ void setup() {
 
   setup_pins();
   setupPreferences();
-  
   setupSensors();
-  
-  // setupDisplay();
-  // setupGui();
+  setupDisplay();
+  setupGui();
 
-  writeFile(SD, "/Test2.txt", "Test\n1234");
-  MS.mediaPresent(false);
-  delay(1000);
-  MS.mediaPresent(true);
+  // writeFile(SD, "/Test2.txt", "Test\n1234");
+  // MS.mediaPresent(false);
+  // delay(1000);
+  // MS.mediaPresent(true);
 }
 
 
 //To-DO updateSensorValues time consumption
 void loop() {
+  loopTime();
   if (sd_inited) recording();
   multiplexerLoop();  // reads buttons every 100ms
   sensorArray.updateSensorValues();
-  //loopTimeMS();
 }
 
 

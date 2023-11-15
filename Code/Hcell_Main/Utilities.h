@@ -132,8 +132,8 @@ void buttonInterpreter(int button, int value) {
       if (value == 1) gui.moveCursor(LEFT);
       break;
     case 1:  //OK
-      if (value == 1) dPad.ok = true;
-      else dPad.ok = false;
+      if (value == 1) gui.selectCursor();
+      else gui.clickCursor();
       break;
     case 2:  //right
       if (value == 1) gui.moveCursor(RIGHT);
@@ -212,21 +212,21 @@ void addDataToBuffer() {
   }
 }
 
-void loopTimeMS() {
+void loopTime() {
   static int frameTime = 0;
-  static int timeStamp = millis();
+  static int timeStamp = micros();
   static int avgCount = 0;
-  int avgNum = 100;
+  int avgNum = 1000;
 
   if (avgCount >= avgNum) {
     frameTime = frameTime / avgNum;
-    HWSerial.print("Average frametime: ");
-    HWSerial.println(frameTime);
+    String looptime = String(frameTime) + "us";
+    t1.setText(looptime);
     frameTime = 0;
     avgCount = 0;
   } else {
-    frameTime += millis() - timeStamp;
-    timeStamp = millis();
+    frameTime += micros() - timeStamp;
+    timeStamp = micros();
     avgCount++;
   }
 }

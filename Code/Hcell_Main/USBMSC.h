@@ -74,7 +74,7 @@ void initSDCard() {
   if (!SD.begin(MicroSD_SPI_CS, *MicroSD_SPI)) {
     HWSerial.print(F("Storage initialization failed ("));
 
-    while(1);
+    //while(1); //
 
     // HWSerial.print(restartCounter); 
     // HWSerial.print("), ");
@@ -83,7 +83,8 @@ void initSDCard() {
     //   HWSerial.println("too many automatic restarts, connect storage and restart manually !");
 
     //   // TO-DO: proceed without storage init --> Flag sd_inited
-    //   sd_inited = false;
+      sd_inited = false;
+      return;
     //   restartCounter = 0;
     //   preferences.putInt(restartKeyName, restartCounter);
     //   return;
