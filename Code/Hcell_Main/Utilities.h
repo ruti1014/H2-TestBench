@@ -8,6 +8,8 @@ void setup_pins() {
   pinMode(PIN_leaksensor, INPUT);
   pinMode(PIN_flowsensor, INPUT);
   pinMode(PIN_start, INPUT_PULLDOWN);  // pull-down --> unpressed == low
+  pinMode(MicroSD_SPI_CS, OUTPUT);
+  pinMode(Display_SPI_CS, OUTPUT);
 
   digitalWrite(PIN_startHcell, LOW);  // to 12 V switch
   digitalWrite(PIN_cutoff, LOW);      // to 24 V switch
@@ -51,6 +53,14 @@ void setupSPI() {
   //Display SPI Class:
   Display_SPI = new SPIClass(HSPI);
   Display_SPI->begin(SPI_SCK, SPI_MISO, SPI_MOSI, Display_SPI_CS);
+
+
+  HWSerial.print("MicroSD CS: "); HWSerial.println(MicroSD_SPI->pinSS());
+  HWSerial.print("Display CS: "); HWSerial.println(Display_SPI->pinSS());
+}
+
+void setupI2C(){
+  I2C.begin(I2C_SDA, I2C_SCL, 100000);
 }
 
 void setupDisplay() {
@@ -216,7 +226,7 @@ void loopTime() {
   static int frameTime = 0;
   static int timeStamp = micros();
   static int avgCount = 0;
-  int avgNum = 1000;
+  int avgNum = 3000;
 
   if (avgCount >= avgNum) {
     frameTime = frameTime / avgNum;

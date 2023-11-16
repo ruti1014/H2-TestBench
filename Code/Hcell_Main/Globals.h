@@ -7,6 +7,7 @@ void setupTimer();
 void setupSPI();
 void setupDisplay();
 void setupSensors();
+void setupI2C();
 void resetFileIndex();
 void startHcell();
 void stopHcell();
@@ -66,15 +67,16 @@ struct directionalPad dPad;
 hw_timer_t *isr_timer = NULL;
 SPIClass* Display_SPI = NULL;
 SPIClass* MicroSD_SPI = NULL;
-SPIClass* spi = NULL;
+TwoWire I2C = TwoWire(0);
 
-TFT_22_ILI9225 tft_ili = TFT_22_ILI9225(TFT_RST, SPI_MISO, Display_SPI_CS, Display_LED);
+// TFT_22_ILI9225 tft_ili = TFT_22_ILI9225(TFT_RST, SPI_MISO, Display_SPI_CS, Display_LED);
+TFT_22_ILI9225 tft_ili = TFT_22_ILI9225(TFT_RST, TFT_RS, Display_SPI_CS, Display_LED);
 
 //create sensor objects
 AnalogSensor h2flow(PIN_flowsensor, "h2flow", SENS_H2FLOW, 1, "ml/s");
 AnalogSensor h2leak(PIN_leaksensor, "h2leak", SENS_H2LEAK, 1, "ppm");
-BmeSensor bme1(0x76, "bme1");
-BmeSensor bme2(0x77, "bme2");
+BmeSensor bme1(0x76, "bme1", &I2C);
+BmeSensor bme2(0x77, "bme2", &I2C);
 
 //create sensor array
 SensorArray sensorArray(numSensors, numData);  //Amount of sensors, amount of captuered data

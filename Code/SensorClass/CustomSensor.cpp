@@ -30,12 +30,14 @@ uint16_t AnalogSensor::getValue() {
 }
 
 //BmeSensor class implementation
-BmeSensor::BmeSensor(int address, String name)
+BmeSensor::BmeSensor(int address, String name, TwoWire *theWire)
   : Sensor(name, 3) {
 
   //Create data Structs
   _data = new SensorData[6];
   _sensorName = name;
+  _address = address;
+  _theWire = theWire;
 
   //populate datastruct
   _data[0].sensorName = _sensorName;
@@ -55,13 +57,15 @@ BmeSensor::BmeSensor(int address, String name)
   _data[2].type = SENS_HUM;
   _data[2].value = 0;
   _data[2].interval = 1;
+}
 
-  //Start
-  bme_available = _bme.begin(address);
+bool BmeSensor::sensorInit(){
+  _bme_available = _bme.begin(_address, _theWire);
+  return _bme_available;
 }
 
 void BmeSensor::update() {
-  if (bme_available) {
+  if (_bme_available) {
     _data[0].value = _bme.readTemperature();
     _data[1].value = _bme.readPressure();
     _data[2].value = _bme.readHumidity();
@@ -80,6 +84,10 @@ uint16_t BmeSensor::getValue(SensorType sensorType) {
   }
 
   return tmp;
+}
+
+bool BmeSensor::isAvailable(){
+  return _bme_available;
 }
 
 

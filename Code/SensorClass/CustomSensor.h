@@ -20,6 +20,7 @@
 
 //Dependencies
 #include <Adafruit_BME280.h>
+#include <Wire.h>
 
 
 
@@ -37,12 +38,16 @@ private:
 // ######### BME280 #########
 class BmeSensor : public Sensor {
 public:
-  BmeSensor(int address, String name);
+  BmeSensor(int address, String name, TwoWire *theWire = &Wire);
+  bool sensorInit();
   void update() override;
   uint16_t getValue(SensorType sensorType);
+  bool isAvailable();
 private:
   Adafruit_BME280 _bme = NULL;
-  bool bme_available = false;
+  int _address = 0;
+  TwoWire* _theWire;
+  bool _bme_available = false;
 };
 
 // ######### HcellRS232 #########

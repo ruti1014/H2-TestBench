@@ -8,14 +8,19 @@
 #define numSens 4
 #define numData 6
 
+#define I2C_SDA 6
+#define I2C_SCL 7
+
 HardwareSerial SerialH(2);
+
+TwoWire I2C = TwoWire(0);
 
 
 //create sensor objects
 AnalogSensor h2flow(19, "h2flow", SENS_H2FLOW, 1, "ml/s");
 AnalogSensor h2leak(19, "h2leak", SENS_H2LEAK, 1, "ppm");
 AnalogSensor rndhum(19, "rndhum", SENS_HUM, 1, "rnd");
-BmeSensor bme1(0x76, "bme1");
+BmeSensor bme1(0x76, "bme1", &I2C);
 
 //create sensor array
 SensorArray sensorArray(numSens, numData);  //Amount of sensors, amount of captuered data
@@ -25,6 +30,8 @@ void setup() {
 
   Serial0.begin(115200);
   Serial0.println("Start");
+
+  I2C.begin(I2C_SDA, I2C_SCL, 100000);
 
   Serial0.println(sizeof(uint8_t));
   Serial0.println(sizeof(SensorData));

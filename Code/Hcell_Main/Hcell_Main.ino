@@ -46,6 +46,7 @@ USBCDC USBSerial;
 #define MicroSD_SPI_CS 39
 #define Display_SPI_CS 21
 
+#define TFT_RS 37
 #define TFT_RST 48
 #define Display_LED 0  // 0 if wired to +5V directly
 
@@ -54,6 +55,10 @@ USBCDC USBSerial;
 #define channelA 14
 #define channelB 35
 #define channelC 47
+
+// I2C Pins:
+#define I2C_SDA 6
+#define I2C_SCL 7
 
 //------------------------------------------------------------------------------------------------
 #define numSensors 4  // number of connected sensors
@@ -69,6 +74,7 @@ USBCDC USBSerial;
 #include <USBMSC.h>
 #include <TFT_22_ILI9225.h>
 #include <Preferences.h>
+#include <Wire.h>
 
 // TO-DO: move below Globals.h
 #include "Sensor.h"
@@ -102,15 +108,27 @@ void setup() {
   SerialHCELL.begin(115200, SERIAL_8N1, 16, 17);  //Baudrate, Protocol, RX, TX
 
   setup_pins();
+  setupI2C();
+
+  HWSerial.println((long int)&I2C,HEX);
+
   setupPreferences();
   setupSensors();
   setupDisplay();
   setupGui();
 
+  // list initial contents of SD-Card
+  HWSerial.println();
+  listDir(SD, "/", 0);
+  HWSerial.println();
+
   // writeFile(SD, "/Test2.txt", "Test\n1234");
   // MS.mediaPresent(false);
   // delay(1000);
   // MS.mediaPresent(true);
+
+  HWSerial.print("BME 1 available: "); HWSerial.println(bme1.isAvailable());
+  HWSerial.print("BME 2 available: "); HWSerial.println(bme2.isAvailable());
 }
 
 

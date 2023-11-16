@@ -142,12 +142,9 @@ void createCSV(fs::FS &fs, uint32_t *fileIndex) {
   String tmpSensorUnit = "";
   String headerCSV = "";
 
-  for(int i=0; i<numData; i++){
-    // TO-DO: 
-    // tmpSensorName = "TestSensor";      
-    // tmpSensorUnit = "°C";             
-    sensorArray.getData(i)->unit;
-    sensorArray.getData(i)->sensorName;
+  for(int i=0; i<numData; i++){            
+    tmpSensorName = sensorArray.getData(i)->sensorName;
+    tmpSensorUnit = sensorArray.getData(i)->unit;
     headerCSV += tmpSensorName + " (" + tmpSensorUnit + ");";
   }
   headerCSV += "\n";

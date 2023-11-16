@@ -5,6 +5,10 @@
 Sensor::Sensor(String name, int dataQuantity)
   : _sensorName(name), _dataQuantity(dataQuantity) {}
 
+bool Sensor::sensorInit(){
+  return true;
+}
+
 int Sensor::getDataQuantity() {
   return _dataQuantity;
 }
@@ -36,6 +40,7 @@ SensorArray::SensorArray(int sensorAmount, int dataAmount)
 bool SensorArray::addSensor(Sensor* sensor) {
   bool sensorAddSucces = false;
   bool dataAddSucces = false;
+  bool sensorInitSuccess = false;
 
   //Add sensor to List;
   if (_sensorIndex < _sensorAmount) {
@@ -55,7 +60,9 @@ bool SensorArray::addSensor(Sensor* sensor) {
     _dataIndex += sensorDataAmount;
   }
 
-  return (sensorAddSucces && dataAddSucces);
+  sensorInitSuccess = sensor->sensorInit();
+
+  return (sensorAddSucces && dataAddSucces && sensorInitSuccess);
 }
 
 void SensorArray::updateSensorValues() {
