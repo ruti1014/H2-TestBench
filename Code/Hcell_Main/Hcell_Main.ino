@@ -62,10 +62,10 @@ USBCDC USBSerial;
 
 //------------------------------------------------------------------------------------------------
 #define numSensors 4  // number of connected sensors
-#define numData 8    // number of data streams e.g. 1 bme280 = 3 data streams (temp, hum, pres)
+#define numData 8     // number of data streams e.g. 1 bme280 = 3 data streams (temp, hum, pres)
 #define sensorBufferSize 100
-#define sampleRateMS 100  //sensor sample rate in ms
-#define storageInitFailed 5 //how many time the esp trys to connect to sd card
+#define sampleRateMS 100     //sensor sample rate in ms
+#define storageInitFailed 5  //how many time the esp trys to connect to sd card
 //------------------------------------------------------------------------------------------------
 
 #include <SD.h>
@@ -95,7 +95,7 @@ USBCDC USBSerial;
 void setup() {
   HWSerial.begin(115200);
   HWSerial.setDebugOutput(true);
-
+  HWSerial.println("Starting");
   USB.onEvent(usbEventCallback);
 
   setupSPI();
@@ -110,7 +110,8 @@ void setup() {
   setup_pins();
   setupI2C();
 
-  HWSerial.println((long int)&I2C,HEX);
+  HWSerial.print("I2C address: ");
+  HWSerial.println((long int)&I2C, HEX);
 
   setupPreferences();
   setupSensors();
@@ -118,17 +119,21 @@ void setup() {
   setupGui();
 
   // list initial contents of SD-Card
-  HWSerial.println();
+  HWSerial.println("Files: ");
   listDir(SD, "/", 0);
-  HWSerial.println();
 
   // writeFile(SD, "/Test2.txt", "Test\n1234");
   // MS.mediaPresent(false);
   // delay(1000);
   // MS.mediaPresent(true);
 
-  HWSerial.print("BME 1 available: "); HWSerial.println(bme1.isAvailable());
-  HWSerial.print("BME 2 available: "); HWSerial.println(bme2.isAvailable());
+  // HWSerial.print("BME 1 available: ");
+  // HWSerial.println(bme1.isAvailable());
+  // HWSerial.print("BME 2 available: ");
+  // HWSerial.println(bme2.isAvailable());
+  
+  // mainPage.setCursor(0, 0);
+  HWSerial.println("READY");
 }
 
 
@@ -138,6 +143,8 @@ void loop() {
   if (sd_inited) recording();
   multiplexerLoop();  // reads buttons every 100ms
   sensorArray.updateSensorValues();
+  updateStatusBar();
+  updateValues();
 }
 
 

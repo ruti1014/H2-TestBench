@@ -62,7 +62,7 @@ BmeSensor::BmeSensor(int address, String name, TwoWire *theWire)
 bool BmeSensor::sensorInit(){
   _bme_available = _bme.begin(_address, _theWire);
   Serial0.println("TEST");
-  Serial0.println((long int)&_theWire,HEX);
+  // Serial0.println((long int)&_theWire,HEX);
   return _bme_available;
 }
 

@@ -56,11 +56,10 @@ public:
 private:
   uint16_t _BGcolor = 0xFF;
   int _rows, _columns;
-  int _columnIndex = 0;
   Gui* _gui;
   GuiPage* _lastPage;
   //Element* _cursor;
-  int _cursorR = 0, _cursorC = 0;
+  int _cursorR, _cursorC;
   Element*** _elementMatrix;  //pointer matrix to elements _elementMatrix[row][column]
 };
 

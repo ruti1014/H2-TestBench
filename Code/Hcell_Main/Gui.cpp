@@ -65,6 +65,9 @@ int Gui::getHeight() {
 GuiPage::GuiPage(Gui* gui, int row, int column)
   : _gui(gui), _rows(row), _columns(column) {
 
+  _cursorR = 0;
+  _cursorC = 0;
+
   //allocate memory for element matrix
   _elementMatrix = new Element**[_rows];
   for (int i = 0; i < _rows; i++) {
@@ -77,6 +80,7 @@ GuiPage::GuiPage(Gui* gui, int row, int column)
 }
 
 void GuiPage::drawPage() {
+  Serial0.println(String(_cursorC));
   fillPage(_BGcolor);
   for (int r = 0; r < _rows; r++) {
     for (int c = 0; c < _columns; c++) {
@@ -84,6 +88,8 @@ void GuiPage::drawPage() {
       else Serial.println("Failed to load element");
     }
   }
+
+  if (getSelectedElement()->isSelectable()) getSelectedElement()->hoverElement();
 }
 
 void GuiPage::fillPage(uint16_t color) {
@@ -116,7 +122,9 @@ void GuiPage::moveCursor(Direction d) {
   int tempR = _cursorR;
   Element* tempElementCursor = NULL;
 
-  switch (d) {
+
+
+  switch (d) {  //Create boundaries for searching -> search limit and direction
     case LEFT:
       numChecks = _columns;
       directionX = -1;
@@ -156,6 +164,11 @@ void GuiPage::moveCursor(Direction d) {
   }
   _cursorC = tempC;
   _cursorR = tempR;
+
+  // Serial0.print("moveCursor() 2 r: ");
+  // Serial0.print(String(_cursorR));
+  // Serial0.print(", c: ");
+  // Serial0.println(String(_cursorC));
 }
 
 void GuiPage::setBGColor(uint16_t color) {
@@ -191,7 +204,7 @@ bool Element::isSelectable() {
 }
 
 void Element::click() {
-  if (_clickCallback != NULL) _clickCallback;
+  if (_clickCallback != NULL) _clickCallback();
   else Serial0.println("No Callback");
 }
 

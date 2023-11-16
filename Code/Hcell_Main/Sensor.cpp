@@ -61,7 +61,6 @@ bool SensorArray::addSensor(Sensor* sensor) {
   }
 
   sensorInitSuccess = sensor->sensorInit();
-
   return (sensorAddSucces && dataAddSucces && sensorInitSuccess);
 }
 

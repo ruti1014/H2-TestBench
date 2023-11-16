@@ -55,11 +55,13 @@ void setupSPI() {
   Display_SPI->begin(SPI_SCK, SPI_MISO, SPI_MOSI, Display_SPI_CS);
 
 
-  HWSerial.print("MicroSD CS: "); HWSerial.println(MicroSD_SPI->pinSS());
-  HWSerial.print("Display CS: "); HWSerial.println(Display_SPI->pinSS());
+  HWSerial.print("MicroSD CS: ");
+  HWSerial.println(MicroSD_SPI->pinSS());
+  HWSerial.print("Display CS: ");
+  HWSerial.println(Display_SPI->pinSS());
 }
 
-void setupI2C(){
+void setupI2C() {
   I2C.begin(I2C_SDA, I2C_SCL, 100000);
 }
 
@@ -137,6 +139,7 @@ void recording() {
 void buttonInterpreter(int button, int value) {
   //value == 0 button release
   //value == 1 button pressed
+  HWSerial.println(button);
   switch (button) {
     case 0:  //left
       if (value == 1) gui.moveCursor(LEFT);
@@ -222,16 +225,83 @@ void addDataToBuffer() {
   }
 }
 
+void updateStatusBar() {
+  static bool lastHcellStatus = false;
+  static bool lastRecFlag = false;
+  static bool lastSDstate = false;
+  int refreshRate = 50;  //minimum refreshrate in ms
+  static int refreshTime = millis();
+
+
+  if (millis() - refreshTime > refreshRate) {
+    //Update statusbar
+    if (lastRecFlag != recordingFlag) {
+      if (recordingFlag) {
+        recordingStatus.setText("rec..");
+        recordingStatus.setTextColor(COLOR_DARKRED);
+      } else {
+        recordingStatus.setText("rec");
+        recordingStatus.setTextColor(COLOR_BLACK);
+      }
+      lastRecFlag = recordingFlag;
+    }
+
+    if (lastHcellStatus != hCellState) {
+      if (hCellState) {
+        hcellStatus.setText("on");
+        hcellStatus.setTextColor(COLOR_GREEN);
+      } else {
+        hcellStatus.setText("off");
+        hcellStatus.setTextColor(COLOR_BLACK);
+      }
+      lastHcellStatus = hCellState;
+    }
+
+    if (lastSDstate != sd_inited) {
+      if (sd_inited) {
+        sdStatus.setText("SD ok");
+        sdStatus.setTextColor(COLOR_GREEN);
+      } else {
+        sdStatus.setText("no SD");
+        sdStatus.setTextColor(COLOR_BLACK);
+      }
+      lastSDstate = sd_inited;
+    }
+    refreshTime = millis();
+  }
+}
+
+void updateValues() {
+  int refreshRate = 1000;  //minimum refreshrate in ms
+  static int refreshTime = millis();
+
+  if (millis() - refreshTime > refreshRate) {
+    if (gui.getCurrentPage() == &p2) { //temp
+      int div = (int)bme1.isAvailable() + (int)bme1.isAvailable();
+      int sum = bme1.getValue(SENS_TEMP) + bme2.getValue(SENS_TEMP);
+      if (div != 0) p2t1.setText(String(sum/div));
+      else p2t1.setText("Temperatur: No Data");
+    }
+  }
+}
+
 void loopTime() {
   static int frameTime = 0;
   static int timeStamp = micros();
   static int avgCount = 0;
-  int avgNum = 3000;
+  int avgNum = 3000;  //Number of loopcycles averaged over
+
 
   if (avgCount >= avgNum) {
     frameTime = frameTime / avgNum;
-    String looptime = String(frameTime) + "us";
-    t1.setText(looptime);
+    String time;
+    String unit = "us";
+    if ((frameTime / 1000) > 0) {
+      frameTime = frameTime / 1000;
+      unit = "ms";
+    }
+    time = String(frameTime) + unit;
+    looptimeText.setText(time);
     frameTime = 0;
     avgCount = 0;
   } else {

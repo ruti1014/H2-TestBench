@@ -1,4 +1,3 @@
-#include "esp32-hal-timer.h"
 //function prototypes
 //Utilities
 void setup_pins();
@@ -8,12 +7,14 @@ void setupSPI();
 void setupDisplay();
 void setupSensors();
 void setupI2C();
+void setupGui();
 void resetFileIndex();
 void startHcell();
 void stopHcell();
 void recording();
 void buttonInterpreter(int, int);
 void addDataToBuffer();
+void updateValues();
 void loopTimeMS();
 void IRAM_ATTR onTimer();
 

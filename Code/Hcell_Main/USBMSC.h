@@ -70,69 +70,74 @@ static void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t eve
 // ######## SD Card SPI init ################################
 void initSDCard() {
 
+  int retryNum = 5;
+  static int retryCount = 0;
+
+  HWSerial.print("Attempting to connect SD-Card ");
   // init SD Class with SPI Class Object:
-  if (!SD.begin(MicroSD_SPI_CS, *MicroSD_SPI)) {
-    HWSerial.print(F("Storage initialization failed ("));
-
-    //while(1); //
-
-    // HWSerial.print(restartCounter); 
-    // HWSerial.print("), ");
-    // // restart automatically (up to 5 times)
-    // if (restartCounter > storageInitFailed) {
-    //   HWSerial.println("too many automatic restarts, connect storage and restart manually !");
-
-    //   // TO-DO: proceed without storage init --> Flag sd_inited
-      sd_inited = false;
-      return;
-    //   restartCounter = 0;
-    //   preferences.putInt(restartKeyName, restartCounter);
-    //   return;
-
-    // } else {
-    //   HWSerial.println("restarting...");
-    //   restartCounter++;  // stored in preferences (permanant storage)
-    //   preferences.putInt(restartKeyName, restartCounter);
-    //   ESP.restart();
-    // }
-  } else {
-    HWSerial.println(F("Storage initialization success"));
-    // restartCounter = 0;
-    // preferences.putInt(restartKeyName, restartCounter);
-    sd_inited = true;
+  while ((!sd_inited) && (retryCount < retryNum)) {
+    sd_inited = SD.begin(MicroSD_SPI_CS, *MicroSD_SPI);
+    HWSerial.print(". ");
+    retryCount++;
+    delay(50);
   }
+  HWSerial.println("");
 
-  // print SD Card Info:
-  HWSerial.print("card size = ");
-  HWSerial.print(SD.cardSize() / (1024 * 1024));
-  HWSerial.print(" MB");
-  HWSerial.print(", used: ");
-  HWSerial.print(SD.usedBytes() / (1024 * 1024));
-  HWSerial.print(" MB");
-  // HWSerial.print(", numSectors = " );
-  // HWSerial.print( SD.numSectors() );
-  // HWSerial.print( ", bytes per sector = " );
-  // HWSerial.print( SD.cardSize() / SD.numSectors() );
-  // HWSerial.print( ", total bytes = " );
-  // HWSerial.print( SD.totalBytes() );
-  HWSerial.print(", usedBytes = ");
-  HWSerial.print(SD.usedBytes());
-  HWSerial.print(", SD Card Type: ");
-  switch (SD.cardType()) {
-    case CARD_MMC:
-      HWSerial.println("MMC");
-      break;
-    case CARD_SD:
-      HWSerial.println("SDSC");
-      break;
-    case CARD_SDHC:
-      HWSerial.println("SDHC");
-      break;
-    case CARD_NONE:
-      HWSerial.println("No SD card attached");
-      break;
-    default:
-      HWSerial.println("UNKNOWN");
+
+  //while(1); //
+
+  // HWSerial.print(restartCounter);
+  // HWSerial.print("), ");
+  // // restart automatically (up to 5 times)
+  // if (restartCounter > storageInitFailed) {
+  //   HWSerial.println("too many automatic restarts, connect storage and restart manually !");
+
+  //   restartCounter = 0;
+  //   preferences.putInt(restartKeyName, restartCounter);
+  //   return;
+
+  // } else {
+  //   HWSerial.println("restarting...");
+  //   restartCounter++;  // stored in preferences (permanant storage)
+  //   preferences.putInt(restartKeyName, restartCounter);
+  //   ESP.restart();
+  // }
+  if (sd_inited) {
+    HWSerial.println("SD-Card successfully connected.");
+    // print SD Card Info:
+    HWSerial.print("card size = ");
+    HWSerial.print(SD.cardSize() / (1024 * 1024));
+    HWSerial.print(" MB");
+    HWSerial.print(", used: ");
+    HWSerial.print(SD.usedBytes() / (1024 * 1024));
+    HWSerial.print(" MB");
+    // HWSerial.print(", numSectors = " );
+    // HWSerial.print( SD.numSectors() );
+    // HWSerial.print( ", bytes per sector = " );
+    // HWSerial.print( SD.cardSize() / SD.numSectors() );
+    // HWSerial.print( ", total bytes = " );
+    // HWSerial.print( SD.totalBytes() );
+    HWSerial.print(", usedBytes = ");
+    HWSerial.print(SD.usedBytes());
+    HWSerial.print(", SD Card Type: ");
+    switch (SD.cardType()) {
+      case CARD_MMC:
+        HWSerial.println("MMC");
+        break;
+      case CARD_SD:
+        HWSerial.println("SDSC");
+        break;
+      case CARD_SDHC:
+        HWSerial.println("SDHC");
+        break;
+      case CARD_NONE:
+        HWSerial.println("No SD card attached");
+        break;
+      default:
+        HWSerial.println("UNKNOWN");
+    }
+  } else {
+    HWSerial.println("SD-Card connection failed!");
   }
 }
 
@@ -147,9 +152,6 @@ void initMS() {
   MS.mediaPresent(true);
   if (SD.numSectors() != 0) MS.begin(SD.numSectors(), SD.cardSize() / SD.numSectors());
   else sd_inited = false;
-
-  HWSerial.print("SD init status: ");
-  HWSerial.println(sd_inited);
 }
 
 // ######## Mass Storage connect ################################
