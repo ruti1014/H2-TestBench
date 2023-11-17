@@ -2,21 +2,22 @@
 //Utilities
 void setup_pins();
 void setupPreferences();
-void setupTimer();
 void setupSPI();
 void setupDisplay();
 void setupSensors();
 void setupI2C();
 void setupGui();
 void resetFileIndex();
+void updateSensorArray();
 void startHcell();
 void stopHcell();
 void recording();
 void buttonInterpreter(int, int);
 void addDataToBuffer();
+void updateDisplay();
+void updateStatusBar();
 void updateValues();
 void loopTimeMS();
-void IRAM_ATTR onTimer();
 
 // enum SensorType;
 // struct SensorData;
@@ -65,7 +66,6 @@ struct directionalPad{
 Preferences preferences;
 HardwareSerial SerialHCELL(2);  //Using Serial2
 struct directionalPad dPad;
-hw_timer_t *isr_timer = NULL;
 SPIClass* Display_SPI = NULL;
 SPIClass* MicroSD_SPI = NULL;
 TwoWire I2C = TwoWire(0);

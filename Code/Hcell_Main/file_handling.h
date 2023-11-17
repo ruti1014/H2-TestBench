@@ -184,9 +184,8 @@ void appendCSV(fs::FS &fs, uint32_t *fileIndex, int bufSize) {
   // append new content
   for (int j = 0; j < bufSize; j++) {
     // get next row
-    for (int i = 0; i < numSensors; i++) {
-      // TO-DO:
-      data = i;       //SensorBuffer[i][j];
+    for (int i = 0; i < numData; i++) {
+      data = SensorBuffer[i][j];
       appendix += data + ";";
     }
     appendix += "\n";

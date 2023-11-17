@@ -19,6 +19,7 @@
 #include "Sensor.h"
 
 //Dependencies
+#include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include <Wire.h>
 
@@ -39,12 +40,12 @@ private:
 class BmeSensor : public Sensor {
 public:
   BmeSensor(int address, String name, TwoWire *theWire = &Wire);
-  bool sensorInit();
+  bool sensorInit() override;
   void update() override;
   uint16_t getValue(SensorType sensorType);
   bool isAvailable();
 private:
-  Adafruit_BME280 _bme = NULL;
+  Adafruit_BME280 _bme;
   int _address = 0;
   TwoWire* _theWire;
   bool _bme_available = false;

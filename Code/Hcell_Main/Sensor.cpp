@@ -6,6 +6,7 @@ Sensor::Sensor(String name, int dataQuantity)
   : _sensorName(name), _dataQuantity(dataQuantity) {}
 
 bool Sensor::sensorInit(){
+  Serial0.println("SENSOR_Init");
   return true;
 }
 
@@ -32,7 +33,7 @@ SensorData* Sensor::getSensorData(int index) {
 SensorArray::SensorArray(int sensorAmount, int dataAmount)
   : _sensorAmount(sensorAmount), _dataAmount(dataAmount) {
   _sensorList = new Sensor*[_sensorAmount];
-  _dataList = new SensorData[_dataAmount];
+  _dataList = new SensorData*[_dataAmount];
   _sensorIndex = 0;
   _dataIndex = 0;
 }
@@ -55,7 +56,7 @@ bool SensorArray::addSensor(Sensor* sensor) {
     for (int i = 0; i < sensorDataAmount; i++) {
       SensorData* data = NULL;
       data = sensor->getSensorData(i);
-      _dataList[_dataIndex + i] = *data;
+      _dataList[_dataIndex + i] = data;
     }
     _dataIndex += sensorDataAmount;
   }
@@ -67,7 +68,6 @@ bool SensorArray::addSensor(Sensor* sensor) {
 void SensorArray::updateSensorValues() {
   //TO-DO interval handling
   //static unsigned int interval = 0;
-
   for (int i = 0; i < _sensorIndex; i++) {
     _sensorList[i]->update();
   }
@@ -84,6 +84,6 @@ String SensorArray::getSensorList() {
 
 SensorData* SensorArray::getData(int i) {
   SensorData* temp = NULL;
-  if (i >= 0 && i < _dataIndex) temp = &_dataList[i];
+  if (i >= 0 && i < _dataIndex) temp = _dataList[i];
   return temp;
 }

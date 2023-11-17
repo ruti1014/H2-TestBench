@@ -38,13 +38,6 @@ void setupPreferences() {
   }
 }
 
-void setupTimer() {
-  isr_timer = timerBegin(0, 80, true);  //Prescaler 80 with cpu clock at 80 MHZ -> 1ms timer count
-  timerAttachInterrupt(isr_timer, &onTimer, true);
-  timerAlarmWrite(isr_timer, sampleRateMS, true);
-  timerAlarmEnable(isr_timer);
-}
-
 void setupSPI() {
   //MicroSD SPI Class:
   MicroSD_SPI = new SPIClass(HSPI);
@@ -66,7 +59,6 @@ void setupI2C() {
 }
 
 void setupDisplay() {
-
   tft_ili.begin(*Display_SPI);
   tft_ili.setOrientation(1);
   tft_ili.setFont(Terminal6x8);
@@ -78,6 +70,8 @@ void setupSensors() {
   sensorArray.addSensor(&h2leak);
   sensorArray.addSensor(&bme1);
   sensorArray.addSensor(&bme2);
+  HWSerial.println(bme1.isAvailable() ? "true" : "false");
+  HWSerial.println(bme1.isAvailable() ? "true" : "false");
 }
 
 void resetFileIndex() {
@@ -86,11 +80,6 @@ void resetFileIndex() {
   preferences.putUInt(recordingKeyName, recordingFileIndex);
   HWSerial.print("new fileIndex: ");
   HWSerial.println(preferences.getUInt(recordingKeyName, 0));
-}
-
-void resetRestartCounter() {
-  restartCounter = 0;
-  preferences.putInt(restartKeyName, restartCounter);
 }
 
 void startHcell() {
@@ -128,6 +117,7 @@ void recording() {
     }
   } else {                             // recording not pressed
     if (lastState != recordingFlag) {  // recording switched off
+      HWSerial.println("rec off, appending...");
       appendCSV(SD, &recordingFileIndex, bufferIndex);
       bufferIndex = 0;
       connectMS(true);  //connect MS to transfer recorded data
@@ -139,7 +129,6 @@ void recording() {
 void buttonInterpreter(int button, int value) {
   //value == 0 button release
   //value == 1 button pressed
-  HWSerial.println(button);
   switch (button) {
     case 0:  //left
       if (value == 1) gui.moveCursor(LEFT);
@@ -180,49 +169,40 @@ void buttonInterpreter(int button, int value) {
   }
 }
 
-// void buttonInterpreter(int button, int value) {
-//   switch (button) {
-//     case 0:
-//       HWSerial.println("CH0");
-//       break;
-//     case 1:
-//       HWSerial.println("CH1");
-//       break;
-//     case 2:
-//       HWSerial.println("CH2");
-//       break;
-//     case 3:
-//       HWSerial.println("CH3");
-//       break;
-//     case 4:
-//       HWSerial.println("CH4");
-//       break;
-//     case 5:
-//       HWSerial.println("CH5");
-//       break;
-//     case 6:
-//       HWSerial.println("CH6");
-//       break;
-//     default:
-//       break;
-//   }
-// }
+void updateSensorArray() {
+  int refreshRate = sampleRateMS;  //minimum refreshrate in ms
+  static int refreshTime = millis();
+  if ((millis() - refreshTime) > refreshRate) {
+    sensorArray.updateSensorValues();
+    refreshTime = millis();
+  }
+}
 
 void addDataToBuffer() {
+  int refreshRate = sampleRateMS;  //minimum refreshrate in ms
+  static int refreshTime = millis();
   static uint16_t tmpSensorData = 0;
 
-  if (!appendBufferFlag) {  // to prevent buffer override
-    // read current sensor data and write to buffer
-    for (int i = 0; i < numData; i++) {
-      tmpSensorData = sensorArray.getData(i)->value;
-      SensorBuffer[i][bufferIndex] = tmpSensorData;
+  if ((millis() - refreshTime) > refreshRate) {
+    if (!appendBufferFlag && recordingFlag) {  // to prevent buffer override
+      // read current sensor data and write to buffer
+      for (int i = 0; i < numData; i++) {
+        tmpSensorData = sensorArray.getData(i)->value;
+        SensorBuffer[i][bufferIndex] = tmpSensorData;
+      }
+      bufferIndex++;
+      if (bufferIndex >= sensorBufferSize) {
+        bufferIndex = 0;  // wrap around
+        appendBufferFlag = true;
+      }
     }
-    bufferIndex++;
-    if (bufferIndex == sensorBufferSize) {
-      bufferIndex = 0;  // wrap around
-      appendBufferFlag = true;
-    }
+    refreshTime = millis();
   }
+}
+
+void updateDisplay() {
+  updateStatusBar();
+  updateValues();
 }
 
 void updateStatusBar() {
@@ -274,13 +254,16 @@ void updateStatusBar() {
 void updateValues() {
   int refreshRate = 1000;  //minimum refreshrate in ms
   static int refreshTime = millis();
+  String data = "BME1 Temp: ";
 
   if (millis() - refreshTime > refreshRate) {
-    if (gui.getCurrentPage() == &p2) { //temp
-      int div = (int)bme1.isAvailable() + (int)bme1.isAvailable();
-      int sum = bme1.getValue(SENS_TEMP) + bme2.getValue(SENS_TEMP);
-      if (div != 0) p2t1.setText(String(sum/div));
-      else p2t1.setText("Temperatur: No Data");
+    if (gui.getCurrentPage() == &p2) {
+      // int div = (int)bme1.isAvailable() + (int)bme2.isAvailable();
+      // int sum = bme1.getValue(SENS_TEMP) + bme2.getValue(SENS_TEMP);
+      // if (div != 0) data += String(sum / div);
+      // else data += "No Data";
+      data += bme1.getValue(SENS_TEMP);
+      p2t1.setText(data);
     }
   }
 }

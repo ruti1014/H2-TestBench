@@ -7,6 +7,7 @@
 
 void a4Callback();
 void p2b1Callback();
+void a8Callback();
 
 TFTGraphics tft(&tft_ili);
 int numPages = 1;
@@ -71,6 +72,7 @@ void setupGui() {
   //callbacks
   a4.onClick(&a4Callback);
   p2b1.onClick(&p2b1Callback);
+  a8.onClick(&a8Callback);
 
   statusPage.setBGColor(COLOR_RED);
   statusPage.addElement(&looptimeText, 0, 0);
@@ -90,4 +92,8 @@ void a4Callback() {
 
 void p2b1Callback() {
   gui.loadPage(&mainPage);
+}
+
+void a8Callback() {
+  resetFileIndex();
 }

@@ -37,7 +37,7 @@ struct SensorData {
 class Sensor {
 public:
   Sensor(String name, int dataQuantity);  //how many values is the sensor capturing e.g. bme280 hum/pres/tmep -> dataQuantity = 3;
-  bool sensorInit();
+  virtual bool sensorInit();
   virtual void update() = 0;
   int getDataQuantity();
   SensorData* getSensorData(int index = 0);
@@ -61,7 +61,7 @@ public:
 
 private:
   Sensor** _sensorList;
-  SensorData* _dataList;
+  SensorData** _dataList;
   int _sensorIndex;
   int _dataIndex;
   int _sensorAmount;

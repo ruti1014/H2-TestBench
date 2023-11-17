@@ -64,7 +64,7 @@ USBCDC USBSerial;
 #define numSensors 4  // number of connected sensors
 #define numData 8     // number of data streams e.g. 1 bme280 = 3 data streams (temp, hum, pres)
 #define sensorBufferSize 100
-#define sampleRateMS 100     //sensor sample rate in ms
+#define sampleRateMS 1000     //sensor sample rate in ms
 #define storageInitFailed 5  //how many time the esp trys to connect to sd card
 //------------------------------------------------------------------------------------------------
 
@@ -89,8 +89,6 @@ USBCDC USBSerial;
 
 #include "Utilities.h"
 
-
-
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void setup() {
   HWSerial.begin(115200);
@@ -110,9 +108,6 @@ void setup() {
   setup_pins();
   setupI2C();
 
-  HWSerial.print("I2C address: ");
-  HWSerial.println((long int)&I2C, HEX);
-
   setupPreferences();
   setupSensors();
   setupDisplay();
@@ -131,7 +126,7 @@ void setup() {
   // HWSerial.println(bme1.isAvailable());
   // HWSerial.print("BME 2 available: ");
   // HWSerial.println(bme2.isAvailable());
-  
+
   // mainPage.setCursor(0, 0);
   HWSerial.println("READY");
 }
@@ -140,14 +135,9 @@ void setup() {
 //To-DO updateSensorValues time consumption
 void loop() {
   loopTime();
+  updateSensorArray();
   if (sd_inited) recording();
   multiplexerLoop();  // reads buttons every 100ms
-  sensorArray.updateSensorValues();
-  updateStatusBar();
-  updateValues();
-}
-
-
-void IRAM_ATTR onTimer() {
+  updateDisplay();
   addDataToBuffer();
 }

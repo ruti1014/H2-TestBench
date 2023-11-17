@@ -60,17 +60,18 @@ BmeSensor::BmeSensor(int address, String name, TwoWire *theWire)
 }
 
 bool BmeSensor::sensorInit(){
+
   _bme_available = _bme.begin(_address, _theWire);
-  Serial0.println("TEST");
-  // Serial0.println((long int)&_theWire,HEX);
+  Serial0.println("Bme ptr address: ");
+  Serial0.println((long int)_theWire,HEX);
   return _bme_available;
 }
 
 void BmeSensor::update() {
   if (_bme_available) {
-    _data[0].value = _bme.readTemperature();
-    _data[1].value = _bme.readPressure();
-    _data[2].value = _bme.readHumidity();
+    _data[0].value = (uint16_t)_bme.readTemperature();
+    _data[1].value = (uint16_t)_bme.readPressure();
+    _data[2].value = (uint16_t)_bme.readHumidity();
   }
 }
 
