@@ -11,6 +11,7 @@ void resetFileIndex();
 void updateSensorArray();
 void startHcell();
 void stopHcell();
+void checkHlimits()
 void recording();
 void buttonInterpreter(int, int);
 void addDataToBuffer();

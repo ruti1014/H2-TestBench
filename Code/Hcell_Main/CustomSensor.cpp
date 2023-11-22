@@ -142,7 +142,7 @@ void Hcell_RS232::update() {
   static int valueFlag = 0;
   static bool requestSerial = true;
 
-  if (requestSerial) {
+  if (requestSerial) { //request data from H-Cell and wait for answer
     switch (valueFlag) {
       case 0:
         _hcellSerial->print("*idn?\r\n");
@@ -171,7 +171,7 @@ void Hcell_RS232::update() {
     answer = _hcellSerial->readString();
     Serial0.println(answer);
     _data[valueFlag].value = (uint16_t)answer.toInt();
-    if (valueFlag >= 5) valueFlag = 1;
+    if (valueFlag >= 5) valueFlag = 1; //reset to 1 to skip serialnumber
     else valueFlag++;
     requestSerial = true;
   }

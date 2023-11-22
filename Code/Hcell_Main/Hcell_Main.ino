@@ -33,12 +33,10 @@ USBCDC USBSerial;
 // pin define     TO-DO PIN correction
 #define PIN_startHcell 4   // Gate 1 MOSFET to start-pin H-Cell (12 V)
 #define PIN_cutoff 5       // Gate 2 MOSFET to cut-off and flowsensor (24 V)
-#define PIN_recording 23   // recording-switch
-#define PIN_leaksensor 98  // leaksensor analog in
-#define PIN_flowsensor 15  // flowsensor analog in
-#define PIN_RX 16
+#define PIN_leaksensor 15  // leaksensor analog in
+#define PIN_flowsensor 16  // flowsensor analog in
+#define PIN_RX 18
 #define PIN_TX 17
-#define PIN_start 18  // start-stop-switch
 // SPI Pins:
 #define SPI_MOSI 41  // Display_SDI
 #define SPI_MISO 42  // Display_RS
@@ -66,6 +64,8 @@ USBCDC USBSerial;
 #define sensorBufferSize 100
 #define sampleRateMS 1000     //sensor sample rate in ms
 #define storageInitFailed 5  //how many time the esp trys to connect to sd card
+#define leakSensorUpperLimit 2804 //max value of H2 concentration -> 10 000 ppm (lower explosive limit)
+#define leakSensorLowerLimit 2100 //safe value to start h-cell at least 25% lower than lower explosive limit
 //------------------------------------------------------------------------------------------------
 
 #include <SD.h>
@@ -137,7 +137,8 @@ void loop() {
   loopTime();
   updateSensorArray();
   if (sd_inited) recording();
-  multiplexerLoop();  // reads buttons every 100ms
+  multiplexerLoop();
+  checkHlimits();
   updateDisplay();
   addDataToBuffer();
 }

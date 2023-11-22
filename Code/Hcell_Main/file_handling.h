@@ -1,4 +1,3 @@
-//#include "soc/uart_struct.h"
 /*  ----------- file_handling.h -----------
 *   Author: Jonas Geckle
 *   Institution: Hochschule Karlsruhe

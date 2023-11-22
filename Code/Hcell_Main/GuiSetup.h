@@ -3,8 +3,6 @@
 
 
 
-//TFT_22_ILI9225 tft_ili = TFT_22_ILI9225(TFT_RST, SPI_MISO, Display_SPI_CS, Display_LED);
-
 void a4Callback();
 void p2b1Callback();
 void a8Callback();

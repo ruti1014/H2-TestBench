@@ -1,13 +1,9 @@
 
-
-
 void setup_pins() {
   pinMode(PIN_startHcell, OUTPUT);
   pinMode(PIN_cutoff, OUTPUT);
-  pinMode(PIN_recording, INPUT_PULLDOWN);
   pinMode(PIN_leaksensor, INPUT);
   pinMode(PIN_flowsensor, INPUT);
-  pinMode(PIN_start, INPUT_PULLDOWN);  // pull-down --> unpressed == low
   pinMode(MicroSD_SPI_CS, OUTPUT);
   pinMode(Display_SPI_CS, OUTPUT);
 
@@ -83,12 +79,14 @@ void resetFileIndex() {
 }
 
 void startHcell() {
-  //TO-DO implement leaksensor limits
+  uint16_t h_value = analogRead(PIN_leaksensor);
   if (!hCellState) {
-    HWSerial.println("Starting Hcell! ");
-    digitalWrite(PIN_cutoff, HIGH);      // open cut-off
-    digitalWrite(PIN_startHcell, HIGH);  // start H-Cell
-    hCellState = true;
+    if (h_value < leakSensorLowerLimit) {
+      HWSerial.println("Starting Hcell! ");
+      digitalWrite(PIN_cutoff, HIGH);      // open cut-off
+      digitalWrite(PIN_startHcell, HIGH);  // start H-Cell
+      hCellState = true;
+    }
   }
 }
 
@@ -98,6 +96,17 @@ void stopHcell() {
     digitalWrite(PIN_cutoff, LOW);      // close cut-off
     digitalWrite(PIN_startHcell, LOW);  // turn off H-Cell
     hCellState = false;
+  }
+}
+
+void checkHlimits() {
+  uint16_t h2_value = analogRead(PIN_leaksensor);
+  if (h_value > leakSensorUpperLimit) {
+    if (hCellState) {
+      stopHcell();
+      Serial.println("H-Cell was stopped due to high H2 values!");
+      hCellState = false;
+    }
   }
 }
 
