@@ -56,6 +56,7 @@ class Hcell_RS232 : public Sensor {
 public:
   Hcell_RS232(HardwareSerial* serial, String name);
   void update() override;
+  uint16_t getValue(SensorType type);
 private:
   HardwareSerial* _hcellSerial = NULL;
 };

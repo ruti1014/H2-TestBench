@@ -3,8 +3,13 @@
 
 
 
-void a1Callback();
-void backp2Callback();
+void loadP2();
+void loadP3();
+void loadP5();
+void loadMainPage();
+void resetFileIndexCallback();
+void restartEPSCallback();
+
 
 TFTGraphics tft(&tft_ili);
 int numPages = 1;
@@ -45,14 +50,35 @@ TextBox bme2_hum(100, 50, 50, textH, "hum", COLOR_LIGHTGREY);
 TextBox bme2_pres(150, 50, 50, textH, "pres", COLOR_LIGHTGREY);
 
 TextBox leakValue(50, 70, 50, textH, "leakval", COLOR_LIGHTGREY);
-TextBox flowValue(50, 90, 50, textH, "leakval", COLOR_LIGHTGREY);
+TextBox flowValue(50, 90, 50, textH, "flowval", COLOR_LIGHTGREY);
+
+
+//Page 3 Hcell
+GuiPage p3(&gui, 6, 1);
+Button back_p3(5, 5, 20, 20, "<", COLOR_RED);
+TextBox serialnr(5, 30, textW, textH, "Seriennummer: ", COLOR_LIGHTGREY);
+TextBox voltage(5, 50, textW, textH, "Spannung: ", COLOR_LIGHTGREY);
+TextBox current(5, 70, textW, textH, "Strom: ", COLOR_LIGHTGREY);
+TextBox h2temp(5, 90, textW, textH, "Stack-Temperatur: ", COLOR_LIGHTGREY);
+TextBox h2pres(5, 110, textW, textH, "Stack-Druck: ", COLOR_LIGHTGREY);
+
+
+//Page 5 Settings
+GuiPage p5(&gui, 5, 5);
+Button back_p5(5, 5, 20, 20, "<", COLOR_RED);
+TextBox resetFileIndexText(5, 30, 1, textH, "File Index: ", COLOR_LIGHTGREY);
+Button resetFileIndexButton(100, 30, 60, buttonH, "Reset", COLOR_RED);
+Button restartESPButton(5, 55, 155, buttonH, "Neustart", COLOR_RED);
+
 
 //Create statusbar page
-GuiPage statusPage(&statusBar, 1, 4);
-TextBox looptimeText(10, 5, 40, 20, "0us", COLOR_ORANGE);
-TextBox recordingStatus(70, 5, 40, 20, "rec", COLOR_ORANGE);
-TextBox hcellStatus(120, 5, 40, 20, "off", COLOR_ORANGE);
+GuiPage statusPage(&statusBar, 1, 5);
+TextBox looptimeText(5, 5, 35, 20, "0us", COLOR_YELLOW);
+TextBox usbStatus(45, 5, 45, 20, "no USB", COLOR_ORANGE);
+TextBox recordingStatus(90, 5, 40, 20, "rec", COLOR_ORANGE);
+TextBox hcellStatus(130, 5, 40, 20, "off", COLOR_ORANGE);
 TextBox sdStatus(170, 5, 40, 20, "no sd", COLOR_ORANGE);
+
 
 void setupGui() {
   //Add page 1 elements
@@ -82,29 +108,68 @@ void setupGui() {
   p2.addElement(&bme2_pres, 2, 3);
   p2.addElement(&leakValue, 3, 1);
   p2.addElement(&flowValue, 4, 1);
-
   p2.setCursor(0, 0);
 
+  //Add page 3 elements
+  p3.setBGColor(COLOR_LIGHTGREY);
+  p3.addElement(&back_p3, 0, 0);
+  p3.addElement(&serialnr, 1, 0);
+  p3.addElement(&voltage, 2, 0);
+  p3.addElement(&current, 3, 0);
+  p3.addElement(&h2temp, 4, 0);
+  p3.addElement(&h2pres, 5, 0);
+  p3.setCursor(0, 0);
+
+  //Add page 5 elements
+  p5.setBGColor(COLOR_LIGHTGREY);
+  p5.addElement(&back_p5, 0, 0);
+  p5.addElement(&resetFileIndexText, 1, 1);
+  p5.addElement(&resetFileIndexButton, 1, 0);
+  p5.addElement(&restartESPButton, 2, 0);
+  p5.setCursor(0, 0);
+
   //callbacks
-  a1.onClick(&a1Callback);
-  back_p2.onClick(&backp2Callback);
+  a1.onClick(&loadP2);
+  a2.onClick(&loadP3);
+  a4.onClick(&loadP5);
+  back_p2.onClick(&loadMainPage);
+  back_p3.onClick(&loadMainPage);
+  back_p5.onClick(&loadMainPage);
+  resetFileIndexButton.onClick(&resetFileIndexCallback);
+  restartESPButton.onClick(&restartEPSCallback);
 
   statusPage.setBGColor(COLOR_RED);
   statusPage.addElement(&looptimeText, 0, 0);
-  statusPage.addElement(&recordingStatus, 0, 1);
-  statusPage.addElement(&hcellStatus, 0, 2);
-  statusPage.addElement(&sdStatus, 0, 3);
+  statusPage.addElement(&usbStatus, 0, 1);
+  statusPage.addElement(&recordingStatus, 0, 2);
+  statusPage.addElement(&hcellStatus, 0, 3);
+  statusPage.addElement(&sdStatus, 0, 4);
 
 
   gui.loadPage(&mainPage);
   statusBar.loadPage(&statusPage);
 }
 
+void resetFileIndexCallback(){
+  resetFileIndex();
+}
 
-void a1Callback() {
+void restartEPSCallback(){
+  ESP.restart();
+}
+
+void loadP2() {
   gui.loadPage(&p2);
 }
 
-void backp2Callback() {
+void loadP3() {
+  gui.loadPage(&p3);
+}
+
+void loadP5(){
+  gui.loadPage(&p5);
+}
+
+void loadMainPage() {
   gui.loadPage(&mainPage);
 }

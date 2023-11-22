@@ -124,7 +124,7 @@ public:
   void hoverElement() override;
   void selectElement() override;
 
-  void setText(String text);
+  void setText(String text, int color = -1); //-1 will use default _textcolor
   void setTextColor(int color);
 private:
   String _text;

@@ -229,38 +229,39 @@ void updateStatusBar() {
 
   if (millis() - refreshTime > refreshRate) {
     //Update statusbar
+    if (!sd_busy && USB_state == PLUGGED) {
+      usbStatus.setText("USB ok");
+    } else {
+      usbStatus.setText("no USB");
+    }
+
     if ((lastRecFlag != recordingFlag) && (sd_inited)) {
       if (recordingFlag) {
-        recordingStatus.setText("rec..");
-        recordingStatus.setTextColor(COLOR_GREEN);
+        recordingStatus.setText("rec..", COLOR_GREEN);
       } else {
-        recordingStatus.setText("rec");
-        recordingStatus.setTextColor(COLOR_BLACK);
+        recordingStatus.setText("rec", COLOR_BLACK);
       }
       lastRecFlag = recordingFlag;
     }
 
     if (lastHcellStatus != hCellState) {
       if (hCellState) {
-        hcellStatus.setText("on");
-        hcellStatus.setTextColor(COLOR_GREEN);
+        hcellStatus.setText("on", COLOR_GREEN);
       } else {
-        hcellStatus.setText("off");
-        hcellStatus.setTextColor(COLOR_BLACK);
+        hcellStatus.setText("off", COLOR_BLACK);
       }
       lastHcellStatus = hCellState;
     }
 
     if (lastSDstate != sd_inited) {
       if (sd_inited) {
-        sdStatus.setText("SD ok");
-        sdStatus.setTextColor(COLOR_GREEN);
+        sdStatus.setText("SD ok", COLOR_GREEN);
       } else {
-        sdStatus.setText("no SD");
-        sdStatus.setTextColor(COLOR_BLACK);
+        sdStatus.setText("no SD", COLOR_BLACK);
       }
       lastSDstate = sd_inited;
     }
+
     refreshTime = millis();
   }
 }
@@ -268,6 +269,7 @@ void updateStatusBar() {
 void updateValues() {
   int refreshRate = 1000;  //minimum refreshrate in ms
   static int refreshTime = millis();
+
 
   if (millis() - refreshTime > refreshRate) {
     if (gui.getCurrentPage() == &p2) {
@@ -287,7 +289,30 @@ void updateValues() {
       bme2_hum.setText(text);
       text = String(bme2.getValue(SENS_PRESSURE)) + " mbar";
       bme2_pres.setText(text);
+
+    } else if (gui.getCurrentPage() == &p3) {
+      if (hcell.getValue(SENS_SERIALID) != 0) {
+        String text;
+        text = "Seriennummer: " + String(hcell.getValue(SENS_SERIALID));
+        serialnr.setText(text);
+        text = "Temp: " + String(hcell.getValue(SENS_SERIALID)) + "^C";
+        h2temp.setText(text);
+        text = "Druck: " + String(hcell.getValue(SENS_SERIALID)) + "mbar";
+        h2pres.setText(text);
+        text = "Strom: " + String(hcell.getValue(SENS_SERIALID)) + "mA";
+        current.setText(text);
+        text = "Spannung: " + String(hcell.getValue(SENS_SERIALID)) + "mV";
+        voltage.setText(text);
+      } else {
+        serialnr.setTextColor(COLOR_RED);
+        serialnr.setText("Brennstoffzelle nicht gefunden!");
+      }
+    } else if (gui.getCurrentPage() == &p5){
+      String text;
+      text = "File Index: " + String(recordingFileIndex);
+      resetFileIndexText.setText(text);
     }
+    refreshTime = millis();
   }
 }
 

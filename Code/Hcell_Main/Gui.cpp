@@ -80,7 +80,6 @@ GuiPage::GuiPage(Gui* gui, int row, int column)
 }
 
 void GuiPage::drawPage() {
-  Serial0.println(String(_cursorC));
   fillPage(_BGcolor);
   for (int r = 0; r < _rows; r++) {
     for (int c = 0; c < _columns; c++) {
@@ -166,10 +165,10 @@ void GuiPage::moveCursor(Direction d) {
   _cursorC = tempC;
   _cursorR = tempR;
 
-  Serial0.print("moveCursor -> r: ");
-  Serial0.print(String(_cursorR));
-  Serial0.print(", c: ");
-  Serial0.println(String(_cursorC));
+  // Serial0.print("moveCursor -> r: ");
+  // Serial0.print(String(_cursorR));
+  // Serial0.print(", c: ");
+  // Serial0.println(String(_cursorC));
 }
 
 void GuiPage::setBGColor(uint16_t color) {
@@ -311,12 +310,12 @@ void TextBox::hoverElement() {}
 
 void TextBox::selectElement() {}
 
-void TextBox::setText(String text) {
+void TextBox::setText(String text, int color) {
+  if (color != -1) _textColor = color;
   _text = text;
   drawElement();
 }
 
 void TextBox::setTextColor(int color) {
   _textColor = color;
-  drawElement();
 }

@@ -108,10 +108,11 @@ void setup() {
   if (sd_inited) initMS();
   setupGui();
 
-  HWSerial.println("READY");
 
   HWSerial.println(bme1.isAvailable() ? "bme1 rdy" : "bme1 not rdy");
   HWSerial.println(bme2.isAvailable() ? "bme2 rdy" : "bme2 not rdy");
+
+    HWSerial.println("READY");
 }
 
 

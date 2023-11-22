@@ -24,14 +24,15 @@ int timestamp_refreshMS = 0;  // to measure a delay of 500 ms   --    '0' indica
 // triggered when PC writes to MSC
 static int32_t onWrite(uint32_t lba, uint32_t offset, uint8_t* buffer, uint32_t bufsize) {
   //HWSerial.printf("MSC WRITE: lba: %u, offset: %u, bufsize: %u\n", lba, offset, bufsize);
-  sd_busy = true;
-  sd_timeout = millis();
+
   return SD.writeRAW((uint8_t*)buffer, lba) ? bufsize : -1;
 }
 
 // triggered when PC reads from MSC
 static int32_t onRead(uint32_t lba, uint32_t offset, void* buffer, uint32_t bufsize) {
-  HWSerial.printf("MSC READ: lba: %u, offset: %u, bufsize: %u\n", lba, offset, bufsize);
+  // HWSerial.printf("MSC READ: lba: %u, offset: %u, bufsize: %u\n", lba, offset, bufsize);
+  sd_busy = true;
+  sd_timeout = millis();
   return SD.readRAW((uint8_t*)buffer, lba) ? 512 : -1;
 }
 
@@ -113,12 +114,12 @@ void initSDCard() {
     HWSerial.print(", used: ");
     HWSerial.print(SD.usedBytes() / (1024 * 1024));
     HWSerial.print(" MB");
-    HWSerial.print(", numSectors = " );
-    HWSerial.print( SD.numSectors() );
-    HWSerial.print( ", bytes per sector = " );
-    HWSerial.print( SD.cardSize() / SD.numSectors() );
-    HWSerial.print( ", total bytes = " );
-    HWSerial.print( SD.totalBytes() );
+    HWSerial.print(", numSectors = ");
+    HWSerial.print(SD.numSectors());
+    HWSerial.print(", bytes per sector = ");
+    HWSerial.print(SD.cardSize() / SD.numSectors());
+    HWSerial.print(", total bytes = ");
+    HWSerial.print(SD.totalBytes());
     HWSerial.print(", usedBytes = ");
     HWSerial.print(SD.usedBytes());
     HWSerial.print(", SD Card Type: ");
@@ -154,7 +155,7 @@ void initMS() {
   MS.mediaPresent(true);
   if (SD.numSectors() != 0) MS.begin(SD.numSectors(), SD.cardSize() / SD.numSectors());
   else sd_inited = false;
- // delay(15000);
+  // delay(15000);
 }
 
 // ######## Mass Storage connect ################################

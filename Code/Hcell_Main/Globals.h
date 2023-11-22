@@ -73,6 +73,7 @@ AnalogSensor h2flow(PIN_flowsensor, "h2flow", SENS_H2FLOW, 1, "ml/s");
 AnalogSensor h2leak(PIN_leaksensor, "h2leak", SENS_H2LEAK, 1, "ppm");
 BmeSensor bme1(0x76, "bme1", &I2C);
 BmeSensor bme2(0x77, "bme2", &I2C);
+Hcell_RS232 hcell(&SerialHCELL, "H2_Cell");
 
 //create sensor array
 SensorArray sensorArray(numSensors, numData);  //Amount of sensors, amount of captuered data

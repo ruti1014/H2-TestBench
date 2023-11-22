@@ -147,7 +147,7 @@ void Hcell_RS232::update() {
   if (requestSerial) {  //request data from H-Cell and wait for answer
     switch (valueFlag) {
       case 0:
-        _hcellSerial->print("*idn?\r\n");
+        _hcellSerial->print("*idn?\r\n");  //Maybe uint16 to small?!
         break;
       case 1:
         _hcellSerial->print("*temp?\r\n");
@@ -177,4 +177,30 @@ void Hcell_RS232::update() {
     else valueFlag++;
     requestSerial = true;
   }
+}
+
+uint16_t Hcell_RS232::getValue(SensorType type) {
+  uint16_t tmp = 0;
+  switch (type) {
+    case SENS_SERIALID:
+      tmp = _data[0].value;
+      break;
+    case SENS_TEMP:
+    tmp = _data[1].value;
+      break;
+    case SENS_PRESSURE:
+    tmp = _data[2].value;
+      break;
+    case SENS_CURRENT:
+    tmp = _data[3].value;
+      break;
+    case SENS_VOLTAGE:
+    tmp = _data[4].value;
+      break;
+    case SENS_ERRCODE:
+    tmp = _data[5].value;
+      break;
+  }
+
+  return tmp;
 }
