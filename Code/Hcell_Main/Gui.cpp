@@ -159,16 +159,17 @@ void GuiPage::moveCursor(Direction d) {
       selectable = tempElementCursor->isSelectable();
       if (!selectable) {
         tempElementCursor = NULL;  //Element found but not selectable -> reset tempElementCursor
+        Serial0.println("Found but not selectable");
       }
     }
   }
   _cursorC = tempC;
   _cursorR = tempR;
 
-  // Serial0.print("moveCursor() 2 r: ");
-  // Serial0.print(String(_cursorR));
-  // Serial0.print(", c: ");
-  // Serial0.println(String(_cursorC));
+  Serial0.print("moveCursor -> r: ");
+  Serial0.print(String(_cursorR));
+  Serial0.print(", c: ");
+  Serial0.println(String(_cursorC));
 }
 
 void GuiPage::setBGColor(uint16_t color) {
@@ -244,6 +245,7 @@ void Button::drawElement() {
 }
 
 void Button::hoverElement() {
+  _gui->getGraphicsAdapter()->drawRect(_posX + 1, _posY + 1, _posX + _width - 1, _posY + _height - 1, _hoverColor);
   _gui->getGraphicsAdapter()->drawRect(_posX, _posY, _posX + _width, _posY + _height, _hoverColor);
 }
 

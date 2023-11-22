@@ -70,7 +70,7 @@ void selectChannel(int channel) {
 // timer function to set read-flag
 void readMultiplexer() {
   static int timeStamp = millis();
-  if ((millis() - timeStamp) >= 100) { // call every 100ms
+  if ((millis() - timeStamp) >= 100) {
     readButtons = true;
     timeStamp = millis();
   }
@@ -84,13 +84,14 @@ void multiplexerLoop() {
 
   readMultiplexer();
 
-  // select channel, read after 5ms, repeat with next channel
+  // select channel
   if (readButtons && !CHselected) {
     selectChannel(CHindex);
     time = millis();
     CHselected = true;
   }
-  if (millis() >= (time + 5) && time != 0) {
+
+  if (millis() >= (time + 15) && time != 0) {
     time = 0;
 
     // read value of selected channel

@@ -30,7 +30,7 @@ uint16_t AnalogSensor::getValue() {
 }
 
 //BmeSensor class implementation
-BmeSensor::BmeSensor(int address, String name, TwoWire *theWire)
+BmeSensor::BmeSensor(int address, String name, TwoWire* theWire)
   : Sensor(name, 3) {
 
   //Create data Structs
@@ -59,37 +59,39 @@ BmeSensor::BmeSensor(int address, String name, TwoWire *theWire)
   _data[2].interval = 1;
 }
 
-bool BmeSensor::sensorInit(){
+bool BmeSensor::sensorInit() {
 
   _bme_available = _bme.begin(_address, _theWire);
-  Serial0.println("Bme ptr address: ");
-  Serial0.println((long int)_theWire,HEX);
+  // Serial0.println("Bme ptr address: ");
+  // Serial0.println((long int)_theWire,HEX);
   return _bme_available;
 }
 
 void BmeSensor::update() {
   if (_bme_available) {
     _data[0].value = (uint16_t)_bme.readTemperature();
-    _data[1].value = (uint16_t)_bme.readPressure();
+    _data[1].value = (uint16_t)(_bme.readPressure() / 100.0);
     _data[2].value = (uint16_t)_bme.readHumidity();
   }
 }
 
 uint16_t BmeSensor::getValue(SensorType sensorType) {
-  uint16_t tmp;
+  uint16_t tmp = 0;
   switch (sensorType) {
     case SENS_TEMP:
       tmp = _data[0].value;
+      break;
     case SENS_PRESSURE:
       tmp = _data[1].value;
+      break;
     case SENS_HUM:
       tmp = _data[2].value;
+      break;
   }
-
   return tmp;
 }
 
-bool BmeSensor::isAvailable(){
+bool BmeSensor::isAvailable() {
   return _bme_available;
 }
 
@@ -142,7 +144,7 @@ void Hcell_RS232::update() {
   static int valueFlag = 0;
   static bool requestSerial = true;
 
-  if (requestSerial) { //request data from H-Cell and wait for answer
+  if (requestSerial) {  //request data from H-Cell and wait for answer
     switch (valueFlag) {
       case 0:
         _hcellSerial->print("*idn?\r\n");
@@ -171,7 +173,7 @@ void Hcell_RS232::update() {
     answer = _hcellSerial->readString();
     Serial0.println(answer);
     _data[valueFlag].value = (uint16_t)answer.toInt();
-    if (valueFlag >= 5) valueFlag = 1; //reset to 1 to skip serialnumber
+    if (valueFlag >= 5) valueFlag = 1;  //reset to 1 to skip serialnumber
     else valueFlag++;
     requestSerial = true;
   }

@@ -62,10 +62,10 @@ USBCDC USBSerial;
 #define numSensors 4  // number of connected sensors
 #define numData 8     // number of data streams e.g. 1 bme280 = 3 data streams (temp, hum, pres)
 #define sensorBufferSize 100
-#define sampleRateMS 1000     //sensor sample rate in ms
-#define storageInitFailed 5  //how many time the esp trys to connect to sd card
-#define leakSensorUpperLimit 2804 //max value of H2 concentration -> 10 000 ppm (lower explosive limit)
-#define leakSensorLowerLimit 2100 //safe value to start h-cell at least 25% lower than lower explosive limit
+#define sampleRateMS 1000          //sensor sample rate in ms
+#define storageInitFailed 5        //how many time the esp trys to connect to sd card
+#define leakSensorUpperLimit 2804  //max value of H2 concentration -> 10 000 ppm (lower explosive limit)
+#define leakSensorLowerLimit 2100  //safe value to start h-cell at least 25% lower than lower explosive limit
 //------------------------------------------------------------------------------------------------
 
 #include <SD.h>
@@ -95,50 +95,34 @@ void setup() {
   HWSerial.setDebugOutput(true);
   HWSerial.println("Starting");
   USB.onEvent(usbEventCallback);
-
   setupSPI();
-  initSDCard();
-  if (sd_inited) initMS();
-
   USBSerial.begin();
   USB.begin();
-
   SerialHCELL.begin(115200, SERIAL_8N1, 16, 17);  //Baudrate, Protocol, RX, TX
-
   setup_pins();
   setupI2C();
-
   setupPreferences();
   setupSensors();
   setupDisplay();
+  initSDCard();
+  if (sd_inited) initMS();
   setupGui();
 
-  // list initial contents of SD-Card
-  HWSerial.println("Files: ");
-  listDir(SD, "/", 0);
-
-  // writeFile(SD, "/Test2.txt", "Test\n1234");
-  // MS.mediaPresent(false);
-  // delay(1000);
-  // MS.mediaPresent(true);
-
-  // HWSerial.print("BME 1 available: ");
-  // HWSerial.println(bme1.isAvailable());
-  // HWSerial.print("BME 2 available: ");
-  // HWSerial.println(bme2.isAvailable());
-
-  // mainPage.setCursor(0, 0);
   HWSerial.println("READY");
+
+  HWSerial.println(bme1.isAvailable() ? "bme1 rdy" : "bme1 not rdy");
+  HWSerial.println(bme2.isAvailable() ? "bme2 rdy" : "bme2 not rdy");
 }
 
 
 //To-DO updateSensorValues time consumption
 void loop() {
   loopTime();
-  updateSensorArray();
-  if (sd_inited) recording();
-  multiplexerLoop();
   checkHlimits();
+  checkSD();
+  updateSensorArray();
+  recording();
+  multiplexerLoop();
   updateDisplay();
   addDataToBuffer();
 }

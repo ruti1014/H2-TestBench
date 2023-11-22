@@ -11,13 +11,14 @@ void resetFileIndex();
 void updateSensorArray();
 void startHcell();
 void stopHcell();
-void checkHlimits()
+void checkHlimits();
 void recording();
 void buttonInterpreter(int, int);
 void addDataToBuffer();
 void updateDisplay();
 void updateStatusBar();
 void updateValues();
+void checkSD();
 void loopTimeMS();
 
 // enum SensorType;
@@ -37,6 +38,9 @@ bool hCellState = false; //true == ON, false == OFF
 bool recordingFlag = false;
 bool appendBufferFlag = false;
 bool sd_inited = false;
+bool sd_busy = false;
+int sd_timeout;
+bool onReadFlag = false;
 bool testwrite = true;      // to write the testfiles only once
 int counter = 0;            // to count 20 sec for the second write-test
 
@@ -54,19 +58,9 @@ int bufferIndex = 0;
 // TO-DO: maybe implement updateIntervall into SensorClass ?
 int updateIntervall = 100;    // sensor update intervall in ms
 
-//structs
-struct directionalPad{
-  bool ok = false;
-  bool left = false;
-  bool right = false;
-  bool up = false;
-  bool down = false;
-};
-
 //objects
 Preferences preferences;
 HardwareSerial SerialHCELL(2);  //Using Serial2
-struct directionalPad dPad;
 SPIClass* Display_SPI = NULL;
 SPIClass* MicroSD_SPI = NULL;
 TwoWire I2C = TwoWire(0);

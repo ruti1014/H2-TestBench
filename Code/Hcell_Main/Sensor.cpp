@@ -6,7 +6,6 @@ Sensor::Sensor(String name, int dataQuantity)
   : _sensorName(name), _dataQuantity(dataQuantity) {}
 
 bool Sensor::sensorInit(){
-  Serial0.println("SENSOR_Init");
   return true;
 }
 

@@ -31,7 +31,7 @@
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
-Adafruit_BME280 bme; // I2C
+Adafruit_BME280 bme;  // I2C
 //Adafruit_BME280 bme(BME_CS); // hardware SPI
 //Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
 
@@ -40,60 +40,61 @@ TwoWire I2CBME = TwoWire(0);
 unsigned long delayTime;
 
 void setup() {
-    Serial0.begin(9600);
-    while(!Serial0);    // time to get Serial0 running
-    Serial0.println(F("BME280 test"));
+  Serial0.begin(9600);
+  while (!Serial0)
+    ;  // time to get Serial0 running
+  Serial0.println(F("BME280 test"));
 
-    I2CBME.begin(I2C_SDA, I2C_SCL, 100000);
+  I2CBME.begin(I2C_SDA, I2C_SCL, 100000);
 
-    unsigned status;
+  unsigned status;
 
-    &Wire;
-    
-    // default settings
-    status = bme.begin(0x76, &I2CBME);
-    // You can also pass in a Wire library object like &Wire2
-    // status = bme.begin(0x76, &Wire2)
-    if (!status) {
-        Serial0.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
-        Serial0.print("SensorID was: 0x"); Serial0.println(bme.sensorID(),16);
-        Serial0.print("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
-        Serial0.print("   ID of 0x56-0x58 represents a BMP 280,\n");
-        Serial0.print("        ID of 0x60 represents a BME 280.\n");
-        Serial0.print("        ID of 0x61 represents a BME 680.\n");
-        while (1) delay(10);
-    }
-    
-    Serial0.println("-- Default Test --");
-    delayTime = 1000;
+  &Wire;
 
-    Serial0.println();
+  // default settings
+  status = bme.begin(0x77, &I2CBME);
+  // You can also pass in a Wire library object like &Wire2
+  // status = bme.begin(0x76, &Wire2)
+  if (!status) {
+    Serial0.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
+    Serial0.print("SensorID was: 0x");
+    Serial0.println(bme.sensorID(), 16);
+    Serial0.print("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
+    Serial0.print("   ID of 0x56-0x58 represents a BMP 280,\n");
+    Serial0.print("        ID of 0x60 represents a BME 280.\n");
+    Serial0.print("        ID of 0x61 represents a BME 680.\n");
+    while (1) delay(10);
+  }
+
+  Serial0.println("-- Default Test --");
+  delayTime = 1000;
+
+  Serial0.println();
 }
 
 
-void loop() { 
-    printValues();
-    delay(delayTime);
+void loop() {
+  printValues();
+  delay(delayTime);
 }
 
 
 void printValues() {
-    Serial0.print("Temperature = ");
-    Serial0.print(bme.readTemperature());
-    Serial0.println(" °C");
+  Serial0.print("Temperature16 = ");
+  Serial0.print((uint16_t)bme.readTemperature());
+  Serial0.println(" °C");
 
-    Serial0.print("Pressure = ");
+  Serial0.print("Temperature = ");
+  Serial0.print(bme.readTemperature());
+  Serial0.println(" °C");
 
-    Serial0.print(bme.readPressure() / 100.0F);
-    Serial0.println(" hPa");
+  Serial0.print("Pressure = ");
+  Serial0.print(bme.readPressure() / 100.0F);
+  Serial0.println(" hPa");
 
-    Serial0.print("Approx. Altitude = ");
-    Serial0.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
-    Serial0.println(" m");
+  Serial0.print("Humidity = ");
+  Serial0.print(bme.readHumidity());
+  Serial0.println(" %");
 
-    Serial0.print("Humidity = ");
-    Serial0.print(bme.readHumidity());
-    Serial0.println(" %");
-
-    Serial0.println();
+  Serial0.println();
 }

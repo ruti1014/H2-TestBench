@@ -56,9 +56,13 @@ void setupI2C() {
 
 void setupDisplay() {
   tft_ili.begin(*Display_SPI);
-  tft_ili.setOrientation(1);
   tft_ili.setFont(Terminal6x8);
+
+  tft_ili.setOrientation(0);  // 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
   tft_ili.clear();
+  tft_ili.setBackgroundColor(COLOR_BLACK);
+  tft_ili.drawBitmap(0, 0, LogoHEK, 176, 220);
+  tft_ili.setOrientation(1);
 }
 
 void setupSensors() {
@@ -66,8 +70,8 @@ void setupSensors() {
   sensorArray.addSensor(&h2leak);
   sensorArray.addSensor(&bme1);
   sensorArray.addSensor(&bme2);
-  HWSerial.println(bme1.isAvailable() ? "true" : "false");
-  HWSerial.println(bme1.isAvailable() ? "true" : "false");
+  // HWSerial.println(bme1.isAvailable() ? "true" : "false");
+  // HWSerial.println(bme1.isAvailable() ? "true" : "false");
 }
 
 void resetFileIndex() {
@@ -79,9 +83,9 @@ void resetFileIndex() {
 }
 
 void startHcell() {
-  uint16_t h_value = analogRead(PIN_leaksensor);
+  uint16_t h2_value = analogRead(PIN_leaksensor);
   if (!hCellState) {
-    if (h_value < leakSensorLowerLimit) {
+    if (h2_value < leakSensorLowerLimit) {
       HWSerial.println("Starting Hcell! ");
       digitalWrite(PIN_cutoff, HIGH);      // open cut-off
       digitalWrite(PIN_startHcell, HIGH);  // start H-Cell
@@ -100,12 +104,15 @@ void stopHcell() {
 }
 
 void checkHlimits() {
-  uint16_t h2_value = analogRead(PIN_leaksensor);
-  if (h_value > leakSensorUpperLimit) {
-    if (hCellState) {
-      stopHcell();
-      Serial.println("H-Cell was stopped due to high H2 values!");
-      hCellState = false;
+  static int timeStamp = millis();
+  if ((millis() - timeStamp) >= 10) {  //Check h2 value in MS
+    uint16_t h2_value = analogRead(PIN_leaksensor);
+    if (h2_value > leakSensorUpperLimit) {
+      if (hCellState) {
+        stopHcell();
+        Serial.println("H-Cell was stopped due to high H2 values!");
+        hCellState = false;
+      }
     }
   }
 }
@@ -113,7 +120,9 @@ void checkHlimits() {
 void recording() {
   static bool lastState = recordingFlag;
 
-  if (recordingFlag) {                 // recording pressed
+  if (!sd_inited) return;
+  if (recordingFlag) {
+    HWSerial.print("Recording... ");   // recording pressed
     if (lastState != recordingFlag) {  // recording pressed for the first time
       connectMS(false);                //disconnect MS to prevent data corruption
       createCSV(SD, &recordingFileIndex);
@@ -140,20 +149,20 @@ void buttonInterpreter(int button, int value) {
   //value == 1 button pressed
   switch (button) {
     case 0:  //left
-      if (value == 1) gui.moveCursor(LEFT);
+      if (value == 1 && !sd_busy) gui.moveCursor(LEFT);
       break;
     case 1:  //OK
-      if (value == 1) gui.selectCursor();
+      if (value == 1 && !sd_busy) gui.selectCursor();
       else gui.clickCursor();
       break;
     case 2:  //right
-      if (value == 1) gui.moveCursor(RIGHT);
+      if (value == 1 && !sd_busy) gui.moveCursor(RIGHT);
       break;
     case 3:  //up
-      if (value == 1) gui.moveCursor(UP);
+      if (value == 1 && !sd_busy) gui.moveCursor(UP);
       break;
     case 4:  //down
-      if (value == 1) gui.moveCursor(DOWN);
+      if (value == 1 && !sd_busy) gui.moveCursor(DOWN);
       break;
     case 5:  //HCell start == 1, stop == 0
       if (value == 1) {
@@ -164,12 +173,8 @@ void buttonInterpreter(int button, int value) {
       break;
     case 6:  //recording start == 1, stop == 0
       if (value == 1) {
-        HWSerial.print("Recording: ");
-        HWSerial.println(value);
         recordingFlag = true;
       } else {
-        HWSerial.print("Recording: ");
-        HWSerial.println(value);
         recordingFlag = false;
       }
       break;
@@ -224,10 +229,10 @@ void updateStatusBar() {
 
   if (millis() - refreshTime > refreshRate) {
     //Update statusbar
-    if (lastRecFlag != recordingFlag) {
+    if ((lastRecFlag != recordingFlag) && (sd_inited)) {
       if (recordingFlag) {
         recordingStatus.setText("rec..");
-        recordingStatus.setTextColor(COLOR_DARKRED);
+        recordingStatus.setTextColor(COLOR_GREEN);
       } else {
         recordingStatus.setText("rec");
         recordingStatus.setTextColor(COLOR_BLACK);
@@ -263,16 +268,33 @@ void updateStatusBar() {
 void updateValues() {
   int refreshRate = 1000;  //minimum refreshrate in ms
   static int refreshTime = millis();
-  String data = "BME1 Temp: ";
 
   if (millis() - refreshTime > refreshRate) {
     if (gui.getCurrentPage() == &p2) {
-      // int div = (int)bme1.isAvailable() + (int)bme2.isAvailable();
-      // int sum = bme1.getValue(SENS_TEMP) + bme2.getValue(SENS_TEMP);
-      // if (div != 0) data += String(sum / div);
-      // else data += "No Data";
-      data += bme1.getValue(SENS_TEMP);
-      p2t1.setText(data);
+      //To do: update sensor values
+
+      String text;
+      text = String(bme1.getValue(SENS_TEMP)) + " ^C";
+      bme1_temp.setText(text);
+      text = String(bme1.getValue(SENS_HUM)) + " %";
+      bme1_hum.setText(text);
+      text = String(bme1.getValue(SENS_PRESSURE)) + " mbar";
+      bme1_pres.setText(text);
+
+      text = String(bme2.getValue(SENS_TEMP)) + " ^C";
+      bme2_temp.setText(text);
+      text = String(bme2.getValue(SENS_HUM)) + " %";
+      bme2_hum.setText(text);
+      text = String(bme2.getValue(SENS_PRESSURE)) + " mbar";
+      bme2_pres.setText(text);
+    }
+  }
+}
+
+void checkSD() {
+  if (sd_busy) {
+    if (millis() - sd_timeout > 100) {  //check last onRead more than 100ms
+      sd_busy = false;                  //onRead done
     }
   }
 }
