@@ -158,17 +158,12 @@ void GuiPage::moveCursor(Direction d) {
       selectable = tempElementCursor->isSelectable();
       if (!selectable) {
         tempElementCursor = NULL;  //Element found but not selectable -> reset tempElementCursor
-        Serial0.println("Found but not selectable");
       }
     }
   }
   _cursorC = tempC;
   _cursorR = tempR;
 
-  // Serial0.print("moveCursor -> r: ");
-  // Serial0.print(String(_cursorR));
-  // Serial0.print(", c: ");
-  // Serial0.println(String(_cursorC));
 }
 
 void GuiPage::setBGColor(uint16_t color) {

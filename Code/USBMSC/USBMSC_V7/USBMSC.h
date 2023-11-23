@@ -72,20 +72,18 @@ void initSDCard(){
   MicroSD_SPI->begin(SPI_SCK, SPI_MISO, SPI_MOSI, MicroSD_SPI_CS);
 
   // init SD Class with SPI Class Object:
-  if ( !SD.begin( MicroSD_SPI_CS, *MicroSD_SPI, 20000000 ) ){
-    HWSerial.print(F("Storage initialization failed, "));
-
-    // restart automatically
-    HWSerial.println("restarting...");
-    ESP.restart();
+  while ( !SD.begin( MicroSD_SPI_CS, *MicroSD_SPI, 4000000 ) ){
+    //                                           4000000
+    HWSerial.println("retry");
+    delay(100);
 
     // restart manually with reset button
     // HWSerial.println("stopped.");
     // while(1);
   }
-  else{       
-    HWSerial.println(F("Storage initialization success"));
-  }
+  // else{       
+  //   HWSerial.println(F("Storage initialization success"));
+  // }
 
   // print SD Card Info:
   HWSerial.print( "card size = " );

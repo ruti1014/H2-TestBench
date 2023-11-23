@@ -79,12 +79,11 @@ void initSDCard() {
   HWSerial.print("Attempting to connect SD-Card ");
   // init SD Class with SPI Class Object:
   while ((!sd_inited) && (retryCount < retryNum)) {
-    sd_inited = SD.begin(MicroSD_SPI_CS, *MicroSD_SPI);
+    sd_inited = SD.begin(MicroSD_SPI_CS, *MicroSD_SPI, 20000000);
     HWSerial.print(". ");
     retryCount++;
     delay(50);
   }
-  HWSerial.println("");
 
 
   //while(1); //

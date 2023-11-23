@@ -171,9 +171,8 @@ void Hcell_RS232::update() {
   String answer;
   if (_hcellSerial->available()) {
     answer = _hcellSerial->readString();
-    Serial0.println(answer);
     _data[valueFlag].value = (uint16_t)answer.toInt();
-    if (valueFlag >= 5) valueFlag = 1;  //reset to 1 to skip serialnumber
+    if (valueFlag >= 5) valueFlag = 0;  //reset to 1 to skip serialnumber
     else valueFlag++;
     requestSerial = true;
   }

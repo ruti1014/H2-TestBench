@@ -30,7 +30,7 @@ USBCDC USBSerial;
 //------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------------------
-// pin define     TO-DO PIN correction
+// pin define 
 #define PIN_startHcell 4   // Gate 1 MOSFET to start-pin H-Cell (12 V)
 #define PIN_cutoff 5       // Gate 2 MOSFET to cut-off and flowsensor (24 V)
 #define PIN_leaksensor 15  // leaksensor analog in
@@ -94,11 +94,13 @@ void setup() {
   HWSerial.begin(115200);
   HWSerial.setDebugOutput(true);
   HWSerial.println("Starting");
+
+  SerialHCELL.begin(9600, SERIAL_8N1, PIN_RX, PIN_TX);
+
   USB.onEvent(usbEventCallback);
   setupSPI();
   USBSerial.begin();
   USB.begin();
-  SerialHCELL.begin(115200, SERIAL_8N1, 16, 17);  //Baudrate, Protocol, RX, TX
   setup_pins();
   setupI2C();
   setupPreferences();
@@ -109,10 +111,10 @@ void setup() {
   setupGui();
 
 
-  HWSerial.println(bme1.isAvailable() ? "bme1 rdy" : "bme1 not rdy");
-  HWSerial.println(bme2.isAvailable() ? "bme2 rdy" : "bme2 not rdy");
+  // HWSerial.println(bme1.isAvailable() ? "bme1 rdy" : "bme1 not rdy");
+  // HWSerial.println(bme2.isAvailable() ? "bme2 rdy" : "bme2 not rdy");
 
-    HWSerial.println("READY");
+  HWSerial.println("READY");
 }
 
 
@@ -126,4 +128,46 @@ void loop() {
   multiplexerLoop();
   updateDisplay();
   addDataToBuffer();
+
+  requestSerialInfo();
+}
+
+
+
+void requestSerialInfo() {
+
+  if (Serial0.available()) {
+    String cmd = Serial0.readStringUntil('\n');
+
+    if (cmd == "idn") {
+      Serial0.print("\nRetrieving Serialnumber... ");
+      SerialHCELL.print("*idn?\r\n");
+    } else if (cmd == "vol") {
+      Serial0.print("\nVoltage (in mV): ");
+      SerialHCELL.print("*vol?\r\n");
+    } else if (cmd == "amp") {
+      Serial0.print("\nCurrent (in mA): ");
+      SerialHCELL.print("*cur?\r\n");
+    } else if (cmd == "tmp") {
+      Serial0.print("\nTemperature (in °C): ");
+      SerialHCELL.print("*temp?\r\n");
+    } else if (cmd == "prs") {
+      Serial0.print("\nPressure (in mbar): ");
+      SerialHCELL.print("*pres?\r\n");
+    } else if (cmd == "err") {
+      Serial0.print("\nError-Code: ");
+      SerialHCELL.print("*error?\r\n");
+    }
+  }
+
+  readSerial();
+}
+
+void readSerial() {
+  String tmp = "";
+  if (SerialHCELL.available()) {
+    tmp = SerialHCELL.readStringUntil('\r');
+    // char tmp = SerialHCELL.read();
+    HWSerial.print(tmp);
+  }
 }

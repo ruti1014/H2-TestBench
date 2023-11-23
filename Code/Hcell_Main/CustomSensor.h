@@ -58,7 +58,7 @@ public:
   void update() override;
   uint16_t getValue(SensorType type);
 private:
-  HardwareSerial* _hcellSerial = NULL;
+  HardwareSerial* _hcellSerial;
 };
 
 
