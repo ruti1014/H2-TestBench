@@ -19,9 +19,16 @@ Planned features: - sensor class containing all sensors -> easy use, modular
 #define PIN_leaksensor 98     // leaksensor analog in
 #define PIN_flowsensor 15     // flowsensor analog in
 #define PIN_emergencystop 99  // emergency-stop
-#define PIN_RX 16
+#define PIN_RX 18
 #define PIN_TX 17
 #define PIN_start 18          // start-stop-switch
+
+#define comPin 3
+#define channelA 14
+#define channelB 35
+#define channelC 47
+
+#define Serial Serial0
 
 int upper_leaklimit = 25;  // todo: correct values
 int lower_leaklimit = 15;
@@ -53,26 +60,14 @@ void setup() {
   SerialH.begin(9600, SERIAL_8N1, PIN_RX, PIN_TX);
   setup_pins();
   setup_state();
+
+  start_Hcell();
+
 }
 
 void loop() {
   update_state();
   requestSerialInfo();
-
-  //H-Cell control logic
-  if (state.leakvalue >= upper_leaklimit)  // leak-value exceeds limit -> danger of explosion
-  {
-    stop_Hcell();
-  } else  // leak-value below limit
-  {
-    if (state.start)  // start switch is pressed
-    {
-      start_Hcell();
-    } else  // start switch off
-    {
-      stop_Hcell();
-    }
-  }
 }
 
 void setup_pins() {
@@ -166,6 +161,8 @@ void requestSerialInfo(){
     } else if (cmd == "err"){
       Serial.print("\nError-Code: ");
       SerialH.print("*error?\r\n");
+    } else{
+      SerialH.print(cmd);
     }
   }
 
@@ -175,6 +172,6 @@ void requestSerialInfo(){
 void readSerial(){
   if (SerialH.available()){
     char tmp = SerialH.read();
-    Serial.print(String(tmp));
+    Serial.print(tmp);
   }
 }

@@ -8,7 +8,7 @@
 #define FILE_HANDLING_H
 
 void writeFile(fs::FS &fs, const char *path, const char *message) {
-  HWSerial.printf("Writing file: %s\n", path);
+  Serial0.printf("Writing file: %s\n", path);
 
   File file = fs.open(path, FILE_WRITE);
   if (!file) {
@@ -24,7 +24,7 @@ void writeFile(fs::FS &fs, const char *path, const char *message) {
 }
 
 void appendFile(fs::FS &fs, const char *path, const char *message) {
-  HWSerial.printf("Appending to file: %s\n", path);
+  Serial0.printf("Appending to file: %s\n", path);
 
   File file = fs.open(path, FILE_APPEND);
 
@@ -43,7 +43,7 @@ void appendFile(fs::FS &fs, const char *path, const char *message) {
 }
 
 void readFile(fs::FS &fs, const char *path) {
-  HWSerial.printf("Reading file: %s\n", path);
+  Serial0.printf("Reading file: %s\n", path);
 
   File file = fs.open(path);
   if (!file) {
@@ -53,13 +53,13 @@ void readFile(fs::FS &fs, const char *path) {
 
   debugprint("Read from file: ");
   while (file.available()) {
-    HWSerial.write(file.read());
+    Serial0.write(file.read());
   }
   file.close();
 }
 
 void removeDir(fs::FS &fs, const char *path) {
-  HWSerial.printf("Removing Dir: %s\n", path);
+  Serial0.printf("Removing Dir: %s\n", path);
   if (fs.rmdir(path)) {
     debugprintln("Dir removed");
   } else {
@@ -68,7 +68,7 @@ void removeDir(fs::FS &fs, const char *path) {
 }
 
 void createDir(fs::FS &fs, const char *path) {
-  HWSerial.printf("Creating Dir: %s\n", path);
+  Serial0.printf("Creating Dir: %s\n", path);
   if (fs.mkdir(path)) {
     debugprintln("Dir created");
   } else {
@@ -77,7 +77,7 @@ void createDir(fs::FS &fs, const char *path) {
 }
 
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
-  HWSerial.printf("Listing directory: %s\n", dirname);
+  Serial0.printf("Listing directory: %s\n", dirname);
 
   File root = fs.open(dirname);
   if (!root) {
@@ -108,7 +108,7 @@ void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
 }
 
 void renameFile(fs::FS &fs, const char *path1, const char *path2) {
-  HWSerial.printf("Renaming file %s to %s\n", path1, path2);
+  Serial0.printf("Renaming file %s to %s\n", path1, path2);
   if (fs.rename(path1, path2)) {
     debugprintln("File renamed");
   } else {
@@ -117,7 +117,7 @@ void renameFile(fs::FS &fs, const char *path1, const char *path2) {
 }
 
 void deleteFile(fs::FS &fs, const char *path) {
-  HWSerial.printf("Deleting file: %s\n", path);
+  Serial0.printf("Deleting file: %s\n", path);
   if (fs.remove(path)) {
     debugprintln("File deleted");
   } else {

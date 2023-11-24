@@ -23,14 +23,14 @@ int timestamp_refreshMS = 0;  // to measure a delay of 500 ms   --    '0' indica
 // ######## USB callback functions ################################
 // triggered when PC writes to MSC
 static int32_t onWrite(uint32_t lba, uint32_t offset, uint8_t* buffer, uint32_t bufsize) {
-  //HWSerial.printf("MSC WRITE: lba: %u, offset: %u, bufsize: %u\n", lba, offset, bufsize);
+  //Serial0.printf("MSC WRITE: lba: %u, offset: %u, bufsize: %u\n", lba, offset, bufsize);
 
   return SD.writeRAW((uint8_t*)buffer, lba) ? bufsize : -1;
 }
 
 // triggered when PC reads from MSC
 static int32_t onRead(uint32_t lba, uint32_t offset, void* buffer, uint32_t bufsize) {
-  // HWSerial.printf("MSC READ: lba: %u, offset: %u, bufsize: %u\n", lba, offset, bufsize);
+  // Serial0.printf("MSC READ: lba: %u, offset: %u, bufsize: %u\n", lba, offset, bufsize);
   sd_busy = true;
   sd_timeout = millis();
   return SD.readRAW((uint8_t*)buffer, lba) ? 512 : -1;
@@ -38,7 +38,7 @@ static int32_t onRead(uint32_t lba, uint32_t offset, void* buffer, uint32_t bufs
 
 // triggered when PC ejects MSC
 static bool onStartStop(uint8_t power_condition, bool start, bool load_eject) {
-  HWSerial.printf("MSC START/STOP: power: %u, start: %u, eject: %u\n", power_condition, start, load_eject);
+  Serial0.printf("MSC START/STOP: power: %u, start: %u, eject: %u\n", power_condition, start, load_eject);
   return true;
 }
 
@@ -48,19 +48,19 @@ static void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t eve
     arduino_usb_event_data_t* data = (arduino_usb_event_data_t*)event_data;
     switch (event_id) {
       case ARDUINO_USB_STARTED_EVENT:
-        HWSerial.println("USB PLUGGED");
+        Serial0.println("USB PLUGGED");
         USB_state = PLUGGED;
         break;
       case ARDUINO_USB_STOPPED_EVENT:
-        HWSerial.println("USB UNPLUGGED");
+        Serial0.println("USB UNPLUGGED");
         USB_state = UNPLUGGED;
         break;
       case ARDUINO_USB_SUSPEND_EVENT:
-        HWSerial.printf("USB SUSPENDED: remote_wakeup_en: %u\n", data->suspend.remote_wakeup_en);
+        Serial0.printf("USB SUSPENDED: remote_wakeup_en: %u\n", data->suspend.remote_wakeup_en);
         USB_state = SUSPENDED;
         break;
       case ARDUINO_USB_RESUME_EVENT:
-        HWSerial.println("USB RESUMED");
+        Serial0.println("USB RESUMED");
         USB_state = RESUMED;
         break;
 
@@ -76,11 +76,11 @@ void initSDCard() {
   int retryNum = 5;
   static int retryCount = 0;
 
-  HWSerial.print("Attempting to connect SD-Card ");
+  Serial0.print("Attempting to connect SD-Card ");
   // init SD Class with SPI Class Object:
   while ((!sd_inited) && (retryCount < retryNum)) {
     sd_inited = SD.begin(MicroSD_SPI_CS, *MicroSD_SPI, 20000000);
-    HWSerial.print(". ");
+    Serial0.print(". ");
     retryCount++;
     delay(50);
   }
@@ -88,58 +88,58 @@ void initSDCard() {
 
   //while(1); //
 
-  // HWSerial.print(restartCounter);
-  // HWSerial.print("), ");
+  // Serial0.print(restartCounter);
+  // Serial0.print("), ");
   // // restart automatically (up to 5 times)
   // if (restartCounter > storageInitFailed) {
-  //   HWSerial.println("too many automatic restarts, connect storage and restart manually !");
+  //   Serial0.println("too many automatic restarts, connect storage and restart manually !");
 
   //   restartCounter = 0;
   //   preferences.putInt(restartKeyName, restartCounter);
   //   return;
 
   // } else {
-  //   HWSerial.println("restarting...");
+  //   Serial0.println("restarting...");
   //   restartCounter++;  // stored in preferences (permanant storage)
   //   preferences.putInt(restartKeyName, restartCounter);
   //   ESP.restart();
   // }
   if (sd_inited) {
-    HWSerial.println("SD-Card successfully connected.");
+    Serial0.println("SD-Card successfully connected.");
     // print SD Card Info:
-    HWSerial.print("card size = ");
-    HWSerial.print(SD.cardSize() / (1024 * 1024));
-    HWSerial.print(" MB");
-    HWSerial.print(", used: ");
-    HWSerial.print(SD.usedBytes() / (1024 * 1024));
-    HWSerial.print(" MB");
-    HWSerial.print(", numSectors = ");
-    HWSerial.print(SD.numSectors());
-    HWSerial.print(", bytes per sector = ");
-    HWSerial.print(SD.cardSize() / SD.numSectors());
-    HWSerial.print(", total bytes = ");
-    HWSerial.print(SD.totalBytes());
-    HWSerial.print(", usedBytes = ");
-    HWSerial.print(SD.usedBytes());
-    HWSerial.print(", SD Card Type: ");
+    Serial0.print("card size = ");
+    Serial0.print(SD.cardSize() / (1024 * 1024));
+    Serial0.print(" MB");
+    Serial0.print(", used: ");
+    Serial0.print(SD.usedBytes() / (1024 * 1024));
+    Serial0.print(" MB");
+    Serial0.print(", numSectors = ");
+    Serial0.print(SD.numSectors());
+    Serial0.print(", bytes per sector = ");
+    Serial0.print(SD.cardSize() / SD.numSectors());
+    Serial0.print(", total bytes = ");
+    Serial0.print(SD.totalBytes());
+    Serial0.print(", usedBytes = ");
+    Serial0.print(SD.usedBytes());
+    Serial0.print(", SD Card Type: ");
     switch (SD.cardType()) {
       case CARD_MMC:
-        HWSerial.println("MMC");
+        Serial0.println("MMC");
         break;
       case CARD_SD:
-        HWSerial.println("SDSC");
+        Serial0.println("SDSC");
         break;
       case CARD_SDHC:
-        HWSerial.println("SDHC");
+        Serial0.println("SDHC");
         break;
       case CARD_NONE:
-        HWSerial.println("No SD card attached");
+        Serial0.println("No SD card attached");
         break;
       default:
-        HWSerial.println("UNKNOWN");
+        Serial0.println("UNKNOWN");
     }
   } else {
-    HWSerial.println("SD-Card connection failed!");
+    Serial0.println("SD-Card connection failed!");
   }
 }
 

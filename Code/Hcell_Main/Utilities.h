@@ -214,6 +214,46 @@ void addDataToBuffer() {
   }
 }
 
+
+void requestSerialInfo() {
+
+  if (Serial0.available()) {
+    String cmd = Serial0.readStringUntil('\n');
+
+    if (cmd == "idn") {
+      Serial0.print("\nSerialnumber: ");
+      SerialHCELL.print("*idn?\r");
+    } else if (cmd == "vol") {
+      Serial0.print("\nVoltage (in mV): ");
+      SerialHCELL.print("*vol?\r\n");
+    } else if (cmd == "amp") {
+      Serial0.print("\nCurrent (in mA): ");
+      SerialHCELL.print("*cur?\r\n");
+    } else if (cmd == "tmp") {
+      Serial0.print("\nTemperature (in °C): ");
+      SerialHCELL.print("*temp?\r\n");
+    } else if (cmd == "prs") {
+      Serial0.print("\nPressure (in mbar): ");
+      SerialHCELL.print("*pres?\r\n");
+    } else if (cmd == "err") {
+      Serial0.print("\nError-Code: ");
+      SerialHCELL.print("*error?\r\n");
+    }
+  }
+
+  readSerial();
+}
+
+void readSerial() {
+  char tmp = 'a';
+  int bytesRemaining = SerialHCELL.available();
+  if (bytesRemaining > 0) {
+    //tmp = SerialHCELL.read();
+    tmp = SerialHCELL.read();
+    HWSerial.print(tmp, DEC);
+  }
+}
+
 void updateDisplay() {
   updateStatusBar();
   updateValues();
@@ -291,9 +331,9 @@ void updateValues() {
       bme2_pres.setText(text);
 
     } else if (gui.getCurrentPage() == &p3) {
-      if (hcell.getValue(SENS_SERIALID) != 0) {
-        String text;
-        text = "Seriennummer: " + String(hcell.getValue(SENS_SERIALID));
+      // if (SerialHCELL.available()) {
+        String text = "";
+        if (SerialHCELL.available()) text = "out: " + SerialHCELL.readStringUntil('\n');
         serialnr.setText(text);
         text = "Temp: " + String(hcell.getValue(SENS_SERIALID)) + "^C";
         h2temp.setText(text);
@@ -303,11 +343,11 @@ void updateValues() {
         current.setText(text);
         text = "Spannung: " + String(hcell.getValue(SENS_SERIALID)) + "mV";
         voltage.setText(text);
-      } else {
-        serialnr.setTextColor(COLOR_RED);
-        serialnr.setText("Brennstoffzelle nicht gefunden!");
-      }
-    } else if (gui.getCurrentPage() == &p5){
+      // } else {
+      //   serialnr.setTextColor(COLOR_RED);
+      //   serialnr.setText("Brennstoffzelle nicht gefunden!");
+      // }
+    } else if (gui.getCurrentPage() == &p5) {
       String text;
       text = "File Index: " + String(recordingFileIndex);
       resetFileIndexText.setText(text);

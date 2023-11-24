@@ -31,8 +31,8 @@ USBCDC USBSerial;
 
 //------------------------------------------------------------------------------------------------
 // pin define 
-#define PIN_startHcell 4   // Gate 1 MOSFET to start-pin H-Cell (12 V)
-#define PIN_cutoff 5       // Gate 2 MOSFET to cut-off and flowsensor (24 V)
+#define PIN_startHcell 4   
+#define PIN_cutoff 5       
 #define PIN_leaksensor 15  // leaksensor analog in
 #define PIN_flowsensor 16  // flowsensor analog in
 #define PIN_RX 18
@@ -76,7 +76,6 @@ USBCDC USBSerial;
 #include <Preferences.h>
 #include <Wire.h>
 
-// TO-DO: move below Globals.h
 #include "Sensor.h"
 #include "CustomSensor.h"
 
@@ -91,7 +90,7 @@ USBCDC USBSerial;
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void setup() {
-  HWSerial.begin(115200);
+  HWSerial.begin(9600);
   HWSerial.setDebugOutput(true);
   HWSerial.println("Starting");
 
@@ -128,46 +127,7 @@ void loop() {
   multiplexerLoop();
   updateDisplay();
   addDataToBuffer();
-
   requestSerialInfo();
 }
 
 
-
-void requestSerialInfo() {
-
-  if (Serial0.available()) {
-    String cmd = Serial0.readStringUntil('\n');
-
-    if (cmd == "idn") {
-      Serial0.print("\nRetrieving Serialnumber... ");
-      SerialHCELL.print("*idn?\r\n");
-    } else if (cmd == "vol") {
-      Serial0.print("\nVoltage (in mV): ");
-      SerialHCELL.print("*vol?\r\n");
-    } else if (cmd == "amp") {
-      Serial0.print("\nCurrent (in mA): ");
-      SerialHCELL.print("*cur?\r\n");
-    } else if (cmd == "tmp") {
-      Serial0.print("\nTemperature (in °C): ");
-      SerialHCELL.print("*temp?\r\n");
-    } else if (cmd == "prs") {
-      Serial0.print("\nPressure (in mbar): ");
-      SerialHCELL.print("*pres?\r\n");
-    } else if (cmd == "err") {
-      Serial0.print("\nError-Code: ");
-      SerialHCELL.print("*error?\r\n");
-    }
-  }
-
-  readSerial();
-}
-
-void readSerial() {
-  String tmp = "";
-  if (SerialHCELL.available()) {
-    tmp = SerialHCELL.readStringUntil('\r');
-    // char tmp = SerialHCELL.read();
-    HWSerial.print(tmp);
-  }
-}

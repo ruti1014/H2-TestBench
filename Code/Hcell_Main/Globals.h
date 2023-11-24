@@ -15,6 +15,8 @@ void checkHlimits();
 void recording();
 void buttonInterpreter(int, int);
 void addDataToBuffer();
+void requestSerialInfo();
+void readSerial();
 void updateDisplay();
 void updateStatusBar();
 void updateValues();
