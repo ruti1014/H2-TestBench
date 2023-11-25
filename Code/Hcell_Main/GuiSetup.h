@@ -1,7 +1,15 @@
+/*  ----------- GuiSetup.h -----------
+*   Authors: Tim Ruf, Jonas Geckle
+*   Institution: Hochschule Karlsruhe
+*   Description: 
+*
+*
+*
+*
+*/
+
 #include "Gui.h"
 #include <TFT_22_ILI9225.h>
-
-
 
 void loadP2();
 void loadP3();
@@ -150,11 +158,11 @@ void setupGui() {
   statusBar.loadPage(&statusPage);
 }
 
-void resetFileIndexCallback(){
+void resetFileIndexCallback() {
   resetFileIndex();
 }
 
-void restartEPSCallback(){
+void restartEPSCallback() {
   ESP.restart();
 }
 
@@ -166,7 +174,7 @@ void loadP3() {
   gui.loadPage(&p3);
 }
 
-void loadP5(){
+void loadP5() {
   gui.loadPage(&p5);
 }
 

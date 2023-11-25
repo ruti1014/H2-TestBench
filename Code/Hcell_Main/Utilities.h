@@ -1,3 +1,8 @@
+/*  ----------- Utilities.h -----------
+*   Authors: Tim Ruf, Jonas Geckle
+*   Institution: Hochschule Karlsruhe
+*   Description: contains definitions of the functions declared in Globals.h
+*/
 
 void setup_pins() {
   pinMode(PIN_startHcell, OUTPUT);
@@ -17,20 +22,13 @@ void setupPreferences() {
   // permanent storage of recordingFileIndex
   preferences.begin("permaStorage", false);  // false --> read/write       true --> read-only
 
-
   recordingFileIndex = preferences.getUInt(recordingKeyName, 0);  // get previous FileIndex (returns 0 if key doesn't exist)
-  restartCounter = preferences.getInt(restartKeyName, -1);
 
   if (recordingFileIndex == 0) {
     recordingFileIndex = 1;
     preferences.putUInt(recordingKeyName, recordingFileIndex);
   } else if (recordingFileIndex == 4294967295) {
     resetFileIndex();
-  }
-
-  if (restartCounter == -1) {
-    restartCounter = 0;
-    preferences.putInt(restartKeyName, restartCounter);
   }
 }
 

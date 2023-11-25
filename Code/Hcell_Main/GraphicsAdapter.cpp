@@ -1,5 +1,14 @@
-#include "GraphicsAdapter.h"
+/*  ----------- GraphicsAdapter.cpp -----------
+*   Authors: Tim Ruf, Jonas Geckle
+*   Institution: Hochschule Karlsruhe
+*   Description: 
+*
+*
+*
+*
+*/
 
+#include "GraphicsAdapter.h"
 
 TFTGraphics::TFTGraphics(TFT_22_ILI9225* tft)
   :_tft(tft) {}

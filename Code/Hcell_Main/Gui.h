@@ -1,9 +1,17 @@
+/*  ----------- Gui.h -----------
+*   Authors: Tim Ruf, Jonas Geckle
+*   Institution: Hochschule Karlsruhe
+*   Description: 
+*
+*
+*
+*
+*/
+
 #ifndef GUI_H
 #define GUI_H
 #include <Arduino.h>
 #include "GraphicsAdapter.h"
-
-
 
 class Element;
 class GuiPage;

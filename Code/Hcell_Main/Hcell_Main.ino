@@ -1,16 +1,16 @@
-/*  Description:     This file connects to an SD Card over SPI and uses this SD Card to create a Mass Storage Device which can be accessed via USB from a Computer.
-*   Author:          Jonas Geckle, Tim Ruf
-*   
+/*  ----------- Hcell_Main.ino -----------
+*   Authors: Tim Ruf, Jonas Geckle
+*   Institution: Hochschule Karlsruhe
+*   Description: 
+*
+*
+*
+*
 *   ESP32-S3 Settings:
 *       USB CDC On Boot: "Enabled"
-*       USB Firmware MSC On Boot: "Disabled"
-*       Upload Mode: UART0 / Hardware CDC
 *       USB Mode: "USB-OTG (Tiny-USB)"
 */
 
-
-
-//------------------------------------------------------------------------------------------------
 #define DEBUG 1
 #ifndef DEBUG
 #define debugprint(x) HWSerial.print(x)
@@ -27,28 +27,27 @@
 #define HWSerial Serial
 USBCDC USBSerial;
 #endif
-//------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------------------
-// pin define 
-#define PIN_startHcell 4   
-#define PIN_cutoff 5       
-#define PIN_leaksensor 15  // leaksensor analog in
-#define PIN_flowsensor 16  // flowsensor analog in
-#define PIN_RX 18
-#define PIN_TX 17
+// pin define
+#define PIN_startHcell 4    // to 12V switch
+#define PIN_cutoff 5        // to 24V switch
+#define PIN_leaksensor 15   // leaksensor analog in
+#define PIN_flowsensor 16   // flowsensor analog in
+#define PIN_RX 18           // serial RX
+#define PIN_TX 17           // serial TX
 // SPI Pins:
-#define SPI_MOSI 41  // Display_SDI
-#define SPI_MISO 42  // Display_RS
+#define SPI_MOSI 41         // Display_SDI
+#define SPI_MISO 42         // Display_RS
 #define SPI_SCK 40
 #define MicroSD_SPI_CS 39
 #define Display_SPI_CS 21
 
 #define TFT_RS 37
 #define TFT_RST 48
-#define Display_LED 0  // 0 if wired to +5V directly
+#define Display_LED 0       // 0 if wired to +5V directly
 
-// Multiplexer Pins:   (ESP32-S3 Pins)
+// Multiplexer Pins:
 #define comPin 3
 #define channelA 14
 #define channelB 35
@@ -117,7 +116,7 @@ void setup() {
 }
 
 
-//To-DO updateSensorValues time consumption
+//TO-DO updateSensorValues time consumption
 void loop() {
   loopTime();
   checkHlimits();
@@ -129,5 +128,3 @@ void loop() {
   addDataToBuffer();
   requestSerialInfo();
 }
-
-

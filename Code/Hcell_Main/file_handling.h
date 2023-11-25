@@ -1,7 +1,12 @@
 /*  ----------- file_handling.h -----------
-*   Author: Jonas Geckle
+*   Authors: Tim Ruf, Jonas Geckle
 *   Institution: Hochschule Karlsruhe
-*   Description: contains functions to read/write/etc. files to a file system
+*   Description: contains functions for interaction with a file system (e.g. SD)
+*                general functions: 
+*                   - writeFile, appendFile, readFile, removeDir, createDir, listDir, renameFile, deleteFile
+*                CSV-functions: 
+*                   - createCSV: creates a CSV with current fileIndex as name, writes a header with sensor names and units
+*                   - appendCSV: appends sensor data from SensorBuffer to the current CSV
 */
 
 #ifndef FILE_HANDLING_H
@@ -189,7 +194,7 @@ void appendCSV(fs::FS &fs, uint32_t *fileIndex, int bufSize) {
     }
     appendix += "\n";
 
-    // append row to file
+    // convert appendix to char array and append row to file
     int appendixLen = appendix.length() + 1;
     char appendixChar[appendixLen];
     appendix.toCharArray(appendixChar, appendixLen);

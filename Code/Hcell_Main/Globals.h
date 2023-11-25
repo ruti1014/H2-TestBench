@@ -1,5 +1,10 @@
-//function prototypes
-//Utilities
+/*  ----------- Globals.h -----------
+*   Authors: Tim Ruf, Jonas Geckle
+*   Institution: Hochschule Karlsruhe
+*   Description: contains function prototypes (defined in Utilities.h) and global flags, variables and objects
+*/
+
+//function prototypes (Utilities.h)
 void setup_pins();
 void setupPreferences();
 void setupSPI();
@@ -23,44 +28,25 @@ void updateValues();
 void checkSD();
 void loopTimeMS();
 
-// enum SensorType;
-// struct SensorData;
-
-// class Sensor;
-// class SensorArray;
-// class AnalogSensor;
-// class BmeSensor;
-// class HCell;
-
-
-
-//global variables
-//flags
-bool hCellState = false; //true == ON, false == OFF
+//global flags, variables and objects
+// ######## flags ################################
+bool hCellState = false;  //true == ON, false == OFF
 bool recordingFlag = false;
 bool appendBufferFlag = false;
 bool sd_inited = false;
 bool sd_busy = false;
-int sd_timeout;
 bool onReadFlag = false;
-bool testwrite = true;      // to write the testfiles only once
-int counter = 0;            // to count 20 sec for the second write-test
 
-bool button_pressed[8] = {false, false, false, false, false, false, false, false};
+// ######## variables ################################
+int sd_timeout = 0;
 
-uint32_t recordingFileIndex = 0;   // index for .csv-files
-const char recordingKeyName[] = "recStorageKey";      // max. 15 chars
-
-int8_t restartCounter = 0;
-const char restartKeyName[] = "restStorageKey";
+uint32_t recordingFileIndex = 0;                  // index for .csv-files
+const char recordingKeyName[] = "recStorageKey";  // max. 15 chars
 
 uint16_t SensorBuffer[numData][sensorBufferSize];
 int bufferIndex = 0;
 
-// TO-DO: maybe implement updateIntervall into SensorClass ?
-int updateIntervall = 100;    // sensor update intervall in ms
-
-//objects
+// ######## objects ################################
 Preferences preferences;
 HardwareSerial SerialHCELL(2);  //Using Serial2
 SPIClass* Display_SPI = NULL;

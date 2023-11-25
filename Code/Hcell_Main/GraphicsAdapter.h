@@ -1,3 +1,13 @@
+/*  ----------- GraphicsAdapter.h -----------
+*   Authors: Tim Ruf, Jonas Geckle
+*   Institution: Hochschule Karlsruhe
+*   Description: 
+*
+*
+*
+*
+*/
+
 #ifndef GRAPHICSADAPTER_H
 #define GRAPHICSADAPTER_H
 

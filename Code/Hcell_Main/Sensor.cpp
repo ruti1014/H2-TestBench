@@ -1,5 +1,10 @@
-#include "Sensor.h"
+/*  ----------- Sensor.cpp -----------
+*   Authors: Tim Ruf, Jonas Geckle
+*   Institution: Hochschule Karlsruhe
+*   Description: This File contains the implementation of the Sensor Class and the SensorArray Class
+*/
 
+#include "Sensor.h"
 
 //Sensor class implementation
 Sensor::Sensor(String name, int dataQuantity)

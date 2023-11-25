@@ -1,6 +1,15 @@
+/*  ----------- Gui.cpp -----------
+*   Authors: Tim Ruf, Jonas Geckle
+*   Institution: Hochschule Karlsruhe
+*   Description: 
+*
+*
+*
+*
+*/
+
 #include <stdexcept>
 #include "Gui.h"
-
 
 //########### GUI ###########
 Gui::Gui(GraphicsAdapter* ga, int posX, int posY, int width, int height, int pageNum)
@@ -163,7 +172,6 @@ void GuiPage::moveCursor(Direction d) {
   }
   _cursorC = tempC;
   _cursorR = tempR;
-
 }
 
 void GuiPage::setBGColor(uint16_t color) {

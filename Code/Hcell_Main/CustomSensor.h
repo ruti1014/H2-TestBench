@@ -1,17 +1,15 @@
 /*  ----------- CustomSensor.h -----------
-    Author: Tim Ruf
-    Institution: Hochschule Karlsruhe
-    Description: This File contains custom declaration of the Sensor Class
-
-    How to add new Sensor: 
-    - define a name for the sensor -> preferrably in constructor
-    - every sensor needs to overwrite the getValue() and update() function.
-    - define dataQuantity aka how many values can the sensor record
-    - populate the _data list with a SensorData struct for every recorded value
-    -> see Sensor.h for more information on the data structure
+*   Authors: Tim Ruf, Jonas Geckle
+*   Institution: Hochschule Karlsruhe
+*   Description: This File contains custom declaration of the Sensor Class
+*
+*   How to add new Sensor: 
+*   - define a name for the sensor -> preferrably in constructor
+*   - every sensor needs to overwrite the getValue() and update() function.
+*   - define dataQuantity aka how many values can the sensor record
+*   - populate the _data list with a SensorData struct for every recorded value
+*   -> see Sensor.h for more information on the data structure
 */
-
-
 
 #ifndef CUSTOMSENSOR_H
 #define CUSTOMSENSOR_H

@@ -1,8 +1,7 @@
 /*  ----------- USBMSC.h -----------
-*   Author: Jonas Geckle
+*   Authors: Tim Ruf, Jonas Geckle
 *   Institution: Hochschule Karlsruhe
 *   Description: initializes an SD-Card (connected via SPI) as a USB Mass Storage Device that can be accessed from a PC via USB
-*                refreshMS() disconnects and reconnects the Mass Storage to the PC (if sd_changed == true)
 */
 
 #ifndef USBMSC_INIT_H
@@ -24,7 +23,6 @@ int timestamp_refreshMS = 0;  // to measure a delay of 500 ms   --    '0' indica
 // triggered when PC writes to MSC
 static int32_t onWrite(uint32_t lba, uint32_t offset, uint8_t* buffer, uint32_t bufsize) {
   //Serial0.printf("MSC WRITE: lba: %u, offset: %u, bufsize: %u\n", lba, offset, bufsize);
-
   return SD.writeRAW((uint8_t*)buffer, lba) ? bufsize : -1;
 }
 
@@ -85,25 +83,6 @@ void initSDCard() {
     delay(50);
   }
 
-
-  //while(1); //
-
-  // Serial0.print(restartCounter);
-  // Serial0.print("), ");
-  // // restart automatically (up to 5 times)
-  // if (restartCounter > storageInitFailed) {
-  //   Serial0.println("too many automatic restarts, connect storage and restart manually !");
-
-  //   restartCounter = 0;
-  //   preferences.putInt(restartKeyName, restartCounter);
-  //   return;
-
-  // } else {
-  //   Serial0.println("restarting...");
-  //   restartCounter++;  // stored in preferences (permanant storage)
-  //   preferences.putInt(restartKeyName, restartCounter);
-  //   ESP.restart();
-  // }
   if (sd_inited) {
     Serial0.println("SD-Card successfully connected.");
     // print SD Card Info:
@@ -154,7 +133,6 @@ void initMS() {
   MS.mediaPresent(true);
   if (SD.numSectors() != 0) MS.begin(SD.numSectors(), SD.cardSize() / SD.numSectors());
   else sd_inited = false;
-  // delay(15000);
 }
 
 // ######## Mass Storage connect ################################
@@ -165,7 +143,5 @@ void connectMS(bool connect) {
     MS.mediaPresent(false);
   }
 }
-
-
 
 #endif

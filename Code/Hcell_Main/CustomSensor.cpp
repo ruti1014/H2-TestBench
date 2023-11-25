@@ -1,8 +1,9 @@
 /*  ----------- CustomSensor.cpp -----------
-    Author: Tim Ruf
-    Institution: Hochschule Karlsruhe
-    Description: This File contains custom implementation of the Sensor Class
+*   Authors: Tim Ruf, Jonas Geckle
+*   Institution: Hochschule Karlsruhe
+*   Description: This File contains custom implementation of the Sensor Class
 */
+
 #include "CustomSensor.h"
 
 //Generic analogSensorClass implementation
@@ -185,19 +186,19 @@ uint16_t Hcell_RS232::getValue(SensorType type) {
       tmp = _data[0].value;
       break;
     case SENS_TEMP:
-    tmp = _data[1].value;
+      tmp = _data[1].value;
       break;
     case SENS_PRESSURE:
-    tmp = _data[2].value;
+      tmp = _data[2].value;
       break;
     case SENS_CURRENT:
-    tmp = _data[3].value;
+      tmp = _data[3].value;
       break;
     case SENS_VOLTAGE:
-    tmp = _data[4].value;
+      tmp = _data[4].value;
       break;
     case SENS_ERRCODE:
-    tmp = _data[5].value;
+      tmp = _data[5].value;
       break;
   }
 

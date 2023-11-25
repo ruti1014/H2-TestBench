@@ -1,5 +1,5 @@
 /*  ----------- Multiplexer.h -----------
-*   Author: Jonas Geckle
+*   Authors: Tim Ruf, Jonas Geckle
 *   Institution: Hochschule Karlsruhe
 *   Description: periodically reads 8 channels of a multiplexer (CH0 to CH7)
 *                multiplexer used in H2-Testbench: CMOS Multiplexer CD4051BE
@@ -10,8 +10,6 @@
 
 #ifndef MULTIPLEXER_INIT_H
 #define MULTIPLEXER_INIT_H
-
-
 
 bool CHvalue[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 bool lastCHvalue[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -67,7 +65,7 @@ void selectChannel(int channel) {
   }
 }
 
-// timer function to set read-flag
+// timer function to set multiplexer read-flag
 void readMultiplexer() {
   static int timeStamp = millis();
   if ((millis() - timeStamp) >= 100) {
@@ -76,7 +74,8 @@ void readMultiplexer() {
   }
 }
 
-// reads all buttons if timer has expired
+// reads all channels if timer in readMultiplexer() has expired,
+// selects channel and waits 15ms before reading the selected channel
 void multiplexerLoop() {
   static int CHindex = 0;
   static int time = 0;
@@ -91,6 +90,7 @@ void multiplexerLoop() {
     CHselected = true;
   }
 
+  // wait after selecting a channel
   if (millis() >= (time + 15) && time != 0) {
     time = 0;
 
@@ -118,7 +118,6 @@ void multiplexerLoop() {
   }
 }
 
-// Multiplexer init
 void initMultiplexer() {
   pinMode(channelA, OUTPUT);
   pinMode(channelB, OUTPUT);

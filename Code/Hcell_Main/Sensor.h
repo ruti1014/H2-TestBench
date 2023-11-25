@@ -1,7 +1,7 @@
 /*  ----------- Sensor.h -----------
-    Author: Tim Ruf
-    Institution: Hochschule Karlsruhe
-    Description: This File contains the declaration of the Sensor Class and the SensorArray Class
+*   Authors: Tim Ruf, Jonas Geckle
+*   Institution: Hochschule Karlsruhe
+*   Description: This File contains the declaration of the Sensor Class and the SensorArray Class
 */
 
 #ifndef SENSOR_H
