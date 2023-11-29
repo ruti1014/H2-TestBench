@@ -80,9 +80,9 @@ USBCDC USBSerial;
 
 #include "Globals.h"
 #include "GuiSetup.h"
-#include "file_handling.h"
+#include "USB_SD_handling/file_handling.h"
 #include "LogoHEK.h"
-#include "USBMSC.h"
+#include "USB_SD_handling/USBMSC.h"
 #include "Multiplexer.h"
 
 #include "Utilities.h"

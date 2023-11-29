@@ -8,7 +8,7 @@
 *
 */
 
-#include "Gui.h"
+#include "GuiClass/Gui.h"
 #include <TFT_22_ILI9225.h>
 
 void loadP2();
